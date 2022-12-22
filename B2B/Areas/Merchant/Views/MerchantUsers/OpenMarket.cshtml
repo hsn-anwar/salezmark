@@ -1,0 +1,173 @@
+﻿@model List<B2B.Areas.Merchant.ViewModel.ShopkeeperVM>
+
+@{
+    Layout = "~/Areas/Merchant/Views/Shared/_LayoutMerchant.cshtml";
+
+}
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="row" style="margin-top:20px">
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-body w_sparkline" style="min-height: 118px;">
+                        <div class="details">
+                            <span>My Shops &nbsp; <small>invited by me</small> </span>
+                            <h4 class="mb-0 counter">@ViewBag.Con</h4>
+                        </div>
+                        <div class="w_chart">
+                            <i class="icon-user-following" style="font-size:45px"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-body w_sparkline" style="min-height: 118px;">
+                        <div class="details">
+                            <span>Inque &nbsp; <small>your pending invitation</small> </span>
+                            <h4 class="mb-0 counter">@ViewBag.Inque</h4>
+                        </div>
+                        <div class="w_chart">
+                            <i class="fa fa-circle-o-notch" style="font-size:45px"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-body w_sparkline" style="min-height: 118px;">
+                        <div class="details">
+                            <span>Total Invites &nbsp; <small>total invitation send by me</small> </span>
+                            <h4 class="mb-0 counter">@ViewBag.Total</h4>
+                        </div>
+                        <div class="w_chart">
+                            <i class="icon-user-follow" style="font-size:45px"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" style="display:block">
+                <h3 class="card-title" style="float: left"><i class="fa fa-group" style="color:#E21E32 !important"></i> &nbsp; My invitation</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>User ID</th>
+                                <th>Country</th>
+                                <th>State</th>
+                                <th>City</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+                                    <td class="d-flex">
+                                        @if (merchant.ImageUrl == null)
+                                        {
+                                            <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Email.Substring(0, 1)</span>
+                                        }
+                                        else
+                                        {
+                                            if (File.Exists(Server.MapPath("~" + merchant.ImageUrl)))
+                                            {
+                                                <img class="avatar" src="@merchant.ImageUrl" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">
+                                            }
+                                            else
+                                            {
+                                                <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Email.Substring(0, 1)</span>
+                                            }
+                                        }
+                                        <div class="ml-3">
+                                            <h6 class="mb-0">@merchant.Name</h6>
+                                            <span class="text-muted">@merchant.Email</span>
+                                        </div>
+                                    </td>
+                                    <td><span>@merchant.UserId</span></td>
+                                    <td><span>@merchant.Country</span></td>
+                                    <td>@merchant.State</td>
+                                    <td>@merchant.City</td>
+                                    <td>
+                                        @if (merchant.Status == "No")
+                                        {
+                                            <span class="tag tag-danger">Invitation not send yet</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@merchant.Status</span>
+                                        }
+                                    </td>
+                                    <td>@if(merchant.Status == "No") {
+                                        <a class="btn btn-primary" style="color:white!important" onclick="confirmBlockUnblockSeller('@merchant.Id')">
+                                            <i class="icon-user-follow"></i>
+                                            Send Invitation
+                                        </a>
+                                    }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("<i class='fa fa-group'></i> Open Market");
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+    function confirmBlockUnblockSeller(sellerId) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You want to invite this shopkeeper.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }, function () {
+            SendInvitation(sellerId);
+        })
+
+    }
+    function SendInvitation(sellerId) {
+          $.ajax({
+            type: "GET",
+              url: "@Url.Action("SendInvitation", "MerchantUsers",new { area="Merchant"})?userId=" + sellerId,
+              success: function (result) {
+                  if (result.Status) {
+                      location.reload();
+                    }
+                    else {
+                        Swal.fire(
+                            'Not Sent!',
+                            result.Msg,
+                            'error'
+                        );
+                  }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+</script>

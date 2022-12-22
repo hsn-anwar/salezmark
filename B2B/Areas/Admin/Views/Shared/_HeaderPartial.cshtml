@@ -1,0 +1,75 @@
+﻿
+
+<div id="header_top" class="header_top">
+    <div class="container">
+        <div class="hleft">
+            <a class="header-brand" href="@Url.Action("Index","Home",new { area="Admin"})"><i class="fe fe-command brand-logo"></i></a>
+            <div class="dropdown">
+                <a href="@Url.Action("Index","AdminUser",new { area="Admin"})" class="nav-link icon xs-hide"><i class="fa fa-id-card-o"></i></a>
+                <a href="@Url.Action("Orders","Marketplace",new { area="Admin"})" class="nav-link icon app_file xs-hide"><i class="fa fa-folder-o"></i></a>
+                <a href="@Url.Action("Inquiries","Marketplace",new { area="Admin"})" class="nav-link icon"><i class="icon-question"></i></a>
+            </div>
+        </div>
+        <div class="hright">
+            <div class="dropdown">
+                <a href="javascript:void(0)" class="nav-link icon menu_toggle"><i class="fa  fa-align-left"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="left-sidebar" class="sidebar ">
+    <h5 class="brand-name">Portal <a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
+    <nav id="left-sidebar-nav" class="sidebar-nav">
+        <ul class="metismenu">
+            <li class="g_heading">Application</li>
+            <li class=""><a href="@Url.Action("Index","Marketplace",new { area="Admin"})"><i class="fa fa-opencart"></i><span>Marketplace</span></a></li>
+            <li class=""><a href="@Url.Action("Index","AdminUser",new { area="Admin"})"><i class="fa fa-users"></i><span>Users</span></a></li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-users"></i><span>Merchants</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("NewMerchant","AdminUser",new { area="Admin"})">Add New</a></li>
+                    <li class=""><a href="@Url.Action("Merchants","AdminUser",new { area="Admin"})">My Merchants</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-user"></i><span>Supermarkets</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("NewSupermarket","AdminUser",new { area="Admin"})">Add New</a></li>
+                    <li class=""><a href="@Url.Action("Supermarkets","AdminUser",new { area="Admin"})">My Supermarkets</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-briefcase"></i><span>Catalog</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("Create","Catalog",new { area="Admin"})">Add New</a></li>
+                    <li class=""><a href="@Url.Action("Index","Catalog",new { area="Admin"})">My Catalogs</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="fa fa-object-group"></i><span>Company</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("Create","Company",new { area="Admin"})">Add New</a></li>
+                    <li class=""><a href="@Url.Action("Index","Company",new { area="Admin"})">My Company</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-briefcase"></i><span>Packages</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("Create","Packages",new { area="Admin"})">Add New</a></li>
+                    <li class=""><a href="@Url.Action("Index","Packages",new { area="Admin"})">My Packages</a></li>
+                </ul>
+            </li>
+            <li class=""><a href="@Url.Action("MerchantPackageInvoice","Packages",new { area="Admin"})"><i class="fa fa-file-pdf-o"></i><span>Invoices</span></a></li>
+            <li class=""><a href="@Url.Action("Orders","Marketplace",new { area="Admin"})"><i class="fa fa-folder-o"></i><span>Orders</span></a></li>
+            <li class="g_heading">Reports</li>
+            <li class=""><a href="@Url.Action("OrdersHistory","Reports",new { area="Admin"})"><i class="icon-pie-chart"></i><span>Orders History</span></a></li>
+            <li class=""><a href="@Url.Action("CatalogReport","Reports",new { area="Admin"})"><i class="icon-bar-chart"></i><span>Catalog Report</span></a></li>
+            <li class=""><a href="@Url.Action("ProductReport","Reports",new { area="Admin"})"><i class="fa fa-history"></i><span>Product Report</span></a></li>
+            <li class=""><a href="@Url.Action("MerchantHistory","Reports",new { area="Admin"})"><i class="fa fa-bar-chart-o"></i><span>Merchant History</span></a></li>
+            <li class=""><a href="@Url.Action("SupermarketHistory","Reports",new { area="Admin"})"><i class="fa fa-line-chart"></i><span>Supermarket History</span></a></li>
+            <li class="g_heading">Support</li>
+            <li class=""><a href="@Url.Action("Inquiries","Marketplace",new { area="Admin"})"><i class="icon-question"></i><span>User Inquiries</span></a></li>
+        </ul>
+    </nav>
+</div>

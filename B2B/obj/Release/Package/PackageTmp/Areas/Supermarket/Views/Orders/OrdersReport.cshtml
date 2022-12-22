@@ -1,0 +1,94 @@
+﻿@model List<B2B.Areas.Merchant.ViewModel.OrdersVM>
+
+@{
+    Layout = "~/Areas/Supermarket/Views/Shared/_SupermarketLayout.cshtml";
+}
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="col-12" style="margin-top:20px">
+            <form action="@Url.Action("OrdersReport","Orders",new { area="Supermarket"})" method="get">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <label>Date</label>
+                                <div class="input-group">
+                                    <input type="date" class="form-control" placeholder="starting from" name="startDate">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <label>&nbsp;</label>
+                                <div class="input-group">
+                                    <input type="date" class="form-control" placeholder="ending at" name="endDate">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label>&nbsp;</label>
+                                <button type="submit" class="btn btn-sm btn-primary btn-block" title="" style="line-height:27px!important">View Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card col-12" style="margin-top:10px">
+            <div class="card-header" style="display: block;">
+                <h3 class="card-title" style="float:left"><i class="fa fa-eye" style="color:#E21E32 !important"></i> &nbsp; Order Report</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Number#</th>
+                                <th>Type</th>
+                                <th>Supervisor Email</th>
+                                <th>Supervisor Phone</th>
+                                <th>Supervisor ID</th>
+                                <th>Total Bill</th>
+                                <th>Delivery Charges</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+                                    <td>@merchant.Date</td>
+                                    <td><span>@merchant.OrderNumber</span></td>
+                                    <td><span>@merchant.Type</span></td>
+                                    <td><span>@merchant.Email</span></td>
+                                    <td><span>@merchant.PhoneNumber</span></td>
+                                    <td><span>@merchant.CustomerName</span></td>
+                                    <td><span>@merchant.TotalBill</span></td>
+                                    <td><span>@merchant.ShippingCharges</span></td>
+                                    <td><span>@merchant.Status</span></td>
+                                    <td>
+                                        <a href="@Url.Action("PrintInvoice","Orders",new { area="Supermarket",orderID=merchant.Id})" class="btn btn-icon btn-sm" title="Print this invoice"><i class="fa fa-print text-blue"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html('<i class="fa fa-list" ></i> Orders report');
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        });
+</script>

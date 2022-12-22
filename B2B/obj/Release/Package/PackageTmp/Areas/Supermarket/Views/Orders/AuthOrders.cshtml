@@ -1,0 +1,131 @@
+﻿@model List<B2B.Areas.Merchant.ViewModel.OrdersVM>
+
+@{
+    Layout = "~/Areas/Supermarket/Views/Shared/_SupermarketLayout.cshtml";
+}
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="card" style="margin-top:20px">
+            <div class="card-header" style="display: block;">
+                <h3 class="card-title" style="float:left"><i class="fa fa-eye" style="color:#E21E32 !important"></i> &nbsp; Inter-department orders</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Number#</th>
+                                <th>Type</th>
+                                <th>Supervisor Email</th>
+                                <th>Supervisor Phone</th>
+                                <th>Supervisor ID</th>
+                                <th>Total Bill</th>
+                                <th>Delivery Charges</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+                                    <td>@merchant.Date</td>
+                                    <td><span>@merchant.OrderNumber</span></td>
+                                    <td><span>@merchant.Type</span></td>
+                                    <td><span>@merchant.Email</span></td>
+                                    <td><span>@merchant.PhoneNumber</span></td>
+                                    <td><span>@merchant.CustomerName</span></td>
+                                    <td><span>@merchant.TotalBill</span></td>
+                                    <td><span>@merchant.ShippingCharges</span></td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm" title="Approved this invoice" onclick="ApproveOrder('@merchant.Id')">Approve</button>
+                                        <button type="button" class="btn btn-primary btn-sm" title="Approved this invoice" onclick="CancelOrder('@merchant.Id')"><i class="fa fa-close"></i></button>
+                                        <a href="@Url.Action("PrintInvoice","Orders",new { area="Supermarket",orderID=merchant.Id})" class="btn btn-icon btn-sm" title="Print this invoice"><i class="fa fa-print text-blue"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html('<i class="fa fa-list" ></i> Orders pending for approval');
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        });
+    var getResponseFromUrl = function (requestType, requestUrl, requestData = null) {
+
+        var response;
+        $.ajax({
+            type: requestType,
+            url: requestUrl,
+            data: requestData,
+            async: false,
+            success: function (data) {
+                response = data;
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+        return response;
+    }
+    function ApproveOrder(Id) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You want to approve this order.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }, function () {
+            var response = getResponseFromUrl('GET', '@Url.Action("ChangeStatus", "Orders",new { area="Supermarket"})?orderID=' + Id);
+            if (response.code == 200) {
+                location.reload();
+            }
+            else {
+                swal(
+                    'Error!',
+                    response.msg,
+                    'error'
+                );
+            }
+        })
+    }
+    function CancelOrder(Id) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You want to cancel this order.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }, function () {
+            var response = getResponseFromUrl('GET', '@Url.Action("CancelOrder", "Orders",new { area="Supermarket"})?orderID=' + Id);
+            if (response.code == 200) {
+                location.reload();
+            }
+            else {
+                swal(
+                    'Error!',
+                    response.msg,
+                    'error'
+                );
+            }
+        })
+    }
+</script>

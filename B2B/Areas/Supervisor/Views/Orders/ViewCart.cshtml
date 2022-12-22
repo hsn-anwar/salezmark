@@ -1,0 +1,274 @@
+﻿@model List<B2B.Areas.Supermarket.ViewModel.CartSessionLine>
+
+@{
+    Layout = "~/Areas/Supervisor/Views/Shared/_LayoutSupervisor.cshtml";
+}
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="row clearfix">
+            <div class="col-lg-8 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <a href="@Url.Action("ViewCarts","Orders",new { area="Supervisor"})" class="btn btn-danger"><i class="fa fa-arrow-left"></i> Back</a>
+                            &nbsp;
+                            <a href="@Url.Action("Add","Orders",new { area="Supervisor"})" class="btn btn-outline-primary"><i class="fa fa-home"></i> Go to marketplace</a>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped table-vcenter text-nowrap mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="w40">#</th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
+                                        <th class="w40"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int i = 1;
+                                    }
+                                    @foreach (var line in Model)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td class="d-flex">
+                                                @if (line.ProductImageUrl == null)
+                                                {
+                                                    <span class="avatar avatar-blue" data-toggle="tooltip" title="@line.ProductName" data-original-title="@line.ProductName">@line.ProductName.Substring(0, 1)</span>
+                                                }
+                                                else
+                                                {
+                                                    if (File.Exists(Server.MapPath("~" + line.ProductImageUrl)))
+                                                    {
+                                                        <img class="avatar" src="@line.ProductImageUrl" data-toggle="tooltip" title="@line.ProductName" data-original-title="@line.ProductName">
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="avatar avatar-blue" data-toggle="tooltip" title="@line.ProductName" data-original-title="@line.ProductName">@line.ProductName.Substring(0, 1)</span>
+                                                    }
+                                                }
+                                                <div class="ml-3">
+                                                    <h6 class="mb-0">@line.ProductName</h6>
+                                                    <span>@line.CategoryName</span>
+                                                </div>
+                                            </td>
+                                            <td>@line.Price</td>
+                                            <td><input onchange="AddCartAjax('@line.LineId',this)" value="@line.Qty" class="form-control qty" type="number" /></td>
+                                            <td>@line.LineTotal</td>
+                                            <td>
+                                                <div class="item-action dropdown">
+                                                    <a href="javascript:void(0)" onclick="DeleteCartAjax('@line.LineId')"><i class="fa fa-trash"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Cart Summary</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <small class="text-muted">Merchant: </small>
+                                <p class="mb-0">@ViewBag.Name</p>
+                            </li>
+                            <li class="list-group-item">
+                                <small class="text-muted">Email: </small>
+                                <p class="mb-0">@ViewBag.Email</p>
+                            </li>
+                            <li class="list-group-item">
+                                <small class="text-muted">Date: </small>
+                                <p class="mb-0">@DateTime.Today</p>
+                            </li>
+                            <li class="list-group-item">
+                                <small class="text-muted">Total Bill: </small>
+                                <p class="mb-0">@ViewBag.TotalBill</p>
+                            </li>
+                            <li class="list-group-item">
+                                <button class="btn btn-primary btn-lg" style="width:100%" data-toggle="modal" data-target="#ProView">Confirm Order</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div id="ProView" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Order confirmation</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="card" id="OrderForm">
+                    <div class="card-body">
+                        <input type="hidden" name="CartId" id="CartId" />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="form-label">Select branch</label>
+                                @Html.DropDownList("BranchId", (IEnumerable<SelectListItem>)ViewBag.categoryId, new { @class = "form-control" })
+                                <br />
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">Delivery</label>
+                                    <div class="selectgroup w-100">
+                                        <label class="selectgroup-item">
+                                            <input type="radio" name="PaymentMethod" value="0" class="selectgroup-input" checked="">
+                                            <span class="selectgroup-button">CASH</span>
+                                        </label>
+                                        <label class="selectgroup-item">
+                                            <input type="radio" name="PaymentMethod" value="2" class="selectgroup-input">
+                                            <span class="selectgroup-button">CREDIT</span>
+                                        </label>
+                                        <label class="selectgroup-item">
+                                            <input type="radio" name="PaymentMethod" value="1" class="selectgroup-input">
+                                            <span class="selectgroup-button">MOBILE</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" style="display:none" id="barcode-dive">
+                                <div id="qrcode" style="margin-left: auto;margin-right: auto;"></div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="withCustomDelivery" value="false" id="DeliveryCheck">
+                                    <span class="custom-control-label">With custom delivery</span>
+                                </label>
+                                <input class="form-control" type="date" name="CustomDeliveryTime" style="display:none" id="customDate" />
+                                <br />
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group mb-0">
+                                    <label class="form-label">Delivery Note</label>
+                                    <textarea rows="5" class="form-control" placeholder="Here can be your note" name="DeliveryNote"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <button type="submit" class="btn btn-primary">Save & print invoice</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="~/Content/js/qrcode.min.js"></script>
+<script type="text/javascript" src="~/Content/js/qrcode.js"></script>
+<script>
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        width: 300,
+        height: 200
+    });
+
+    qrcode.makeCode("sssssssssssssssssssss");
+    $(document).ready(function () {
+        $("#Page_Title").html("Check out");
+        $("#CartId").val("@ViewBag.CartId");
+        $('#DeliveryCheck').change(function () {
+            if (!this.checked)
+                $('#customDate').hide();
+            else
+                $('#customDate').show();
+
+        });
+        $("input[name='PaymentMethod']").change(function () {
+            var radioValue = $(this).val();
+            if (radioValue == 1)
+                $('#barcode-dive').show();
+            else
+                $('#barcode-dive').hide();
+
+        });
+    })
+    function DeleteCartAjax(prodId) {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("Remove", "Orders", new { area= "Supervisor" })?productId=" + prodId,
+            success: function (result) {
+                if (result.code == 200) {
+                    location.reload();
+                }
+                else {
+                    swal(
+                        'Not added',
+                        result.msg,
+                        'error'
+                    );
+                }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+    function AddCartAjax(prodId, evt) {
+        var qty=$(evt).val();
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("Addqtyincart", "Orders", new { area= "Supervisor" })?productId=" + prodId+"&qty="+qty,
+            success: function (result) {
+                if (result.code == 200) {
+                    location.reload();
+                }
+                else {
+                    swal(
+                        'Not added',
+                        result.msg,
+                        'error'
+                    );
+                }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+    $("#OrderForm").submit(function (e) {
+
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+
+        var form = $(this);
+        var url = form.attr('action');
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("ConfirmOrder", "Orders", new { area = "Supervisor" })",
+            data: form.serialize(), // serializes the form's elements.
+            success: function (result) {
+                if (result.code == 200) {
+                    location.href = "@Url.Action("PrintInvoice", "Orders", new { area = "Supervisor" })?orderID=" + result.msg;
+                }
+                else {
+                    swal(
+                        'Not added',
+                        result.msg,
+                        'error'
+                    );
+                }
+            }
+        });
+    });
+
+</script>
+

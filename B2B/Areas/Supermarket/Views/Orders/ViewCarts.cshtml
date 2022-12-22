@@ -1,0 +1,66 @@
+﻿@model List<B2B.Areas.Supermarket.ViewModel.CartSessionHeader>
+@{
+    ViewBag.Title = "ViewCarts";
+    Layout = "~/Areas/Supermarket/Views/Shared/_SupermarketLayout.cshtml";
+}
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="row clearfix">
+            
+            <div class="card">
+                <div class="card-header bline pt-1">
+                    <h3 class="card-title" style="padding: 13px 0px;">Shopping cart <small>carts according to merchants</small></h3>
+                </div>
+                <div class="card-body">
+                    <ul class="right_chat list-unstyled list" style="width:100%">
+                        @if (Model.Count() > 0)
+                        {
+                            foreach (var line in Model)
+                            {
+                                <li class="online">
+                                    <a href="@Url.Action("ViewCart","Orders",new { area="Supermarket",id=line.Id})">
+                                        <div class="media">
+                                            <img class="media-object" src="@line.ImageUrl" alt="">
+                                            <div class="media-body">
+                                                <span class="name">@line.Name</span>
+                                                <span class="message">@line.Email</span>
+                                                <span class="badge badge-outline status"></span>
+                                            </div>
+                                            <div class="media-bottom">
+                                                <h6 style="padding-top:10px">@line.Count Products &nbsp; <i class="fa fa-shopping-basket"></i> </h6>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="offline">
+                                <a href="#">
+                                    <div class="media">
+                                        <img class="media-object" src="#" alt="">
+                                        <div class="media-body">
+                                            <span class="name">No cart found!</span>
+                                            <span class="message">Please add products into cart.</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="@Url.Action("Add","Orders",new { area="Supermarket"})" class="btn btn-danger btn-lg"><i class="fa fa-arrow-left"></i> Back</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("Merchant carts");
+    })
+</script>

@@ -1,0 +1,119 @@
+﻿@model B2B.Areas.Admin.ViewModel.PackageViewModel
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="card">
+            @using (Html.BeginForm("Create", "Packages", new { area = "Admin" }, FormMethod.Post, new { @class = "form-horizontal", role = "form", @enctype = "multipart/form-data", @id= "OrderForm" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body">
+                    <div class="row clearfix">
+                        <div class="col-lg-12" style="padding-bottom: 25px;">
+                            <h5>Package Cover</h5>
+                            <input type="file" class="dropify" name="ImageFile" id="ImageFile">
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Name</label>
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @placeholder = "Name *" })
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Amount</label>
+                                @Html.TextBoxFor(m => m.Amount, new { @class = "form-control", @placeholder = "Amount *", @type = "number" })
+                                @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Duration</label>
+                                @Html.TextBoxFor(m => m.Duration, new { @class = "form-control", @placeholder = "Duration *", @type = "number" })
+                                @Html.ValidationMessageFor(m => m.Duration, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Duration Type</label>
+                                @Html.EnumDropDownListFor(m => m.DurationType, new { @class = "form-control", @placeholder = "Duration *" })
+                                @Html.ValidationMessageFor(m => m.DurationType, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", @placeholder = "Description", @rows = "5" })
+                                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Note</label>
+                                @Html.TextAreaFor(m => m.Note, new { @class = "form-control", @placeholder = "Note", @rows = "5" })
+                                @Html.ValidationMessageFor(m => m.Note, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <hr class="mt-4">
+                            <h6>Assign Feature</h6>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Assign</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(B2B.Areas.Admin.ViewModel.FeatureViewModel line in ViewBag.Feature)
+                                        {
+                                            <tr>
+                                                <td>@line.Name</td>
+                                                <td>
+                                                    <label class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" name="FeatureIDs" value="@line.Id">
+                                                        <span class="custom-control-label">&nbsp;</span>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 mt-3">
+                            <button class="btn btn-primary" type="submit">Add new package</button>
+                            <a href="@Url.Action("Index","Packages",new { area="Admin"})" class="btn btn-outline-primary"><i class="fa fa-backward"></i> &nbsp; Back</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("Add new Package");
+    })
+    $("#OrderForm").submit(function (e) {
+
+
+        if ($('input[name=FeatureIDs]:checked').length > 0) {
+            // do something here
+            return true;
+        }
+        else {
+            swal(
+                'Invalid Features',
+                'Please select minimum one(1) feature to add package',
+                'error'
+            );
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        }
+    });
+</script>

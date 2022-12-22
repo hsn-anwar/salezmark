@@ -1,0 +1,126 @@
+﻿@model List<B2B.Areas.Admin.ViewModel.PackageViewModel>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="card" style="margin-top:20px">
+            <div class="card-header" style="display:block">
+                <h3 class="card-title" style="float:left">My Packages</h3>
+                <a href="@Url.Action("Create","Packages",new { area="Admin"})" class="btn btn-default" style="float:right">Create new package</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Created On</th>
+                                <th>Package Id</th>
+                                <th>Amount</th>
+                                <th>Duration</th>
+                                <th>Duration Type</th>
+                                <th>Note</th>
+                                <th>Features</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                            <tr>
+                                <td class="d-flex">
+                                    @if (merchant.ImageUrl == null)
+                                    {
+                                        <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Name.Substring(0, 1)</span>
+                                    }
+                                    else
+                                    {
+                                        if (File.Exists(Server.MapPath("~" + merchant.ImageUrl)))
+                                        {
+                                            <img class="avatar" src="@merchant.ImageUrl" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">
+                                        }
+                                        else
+                                        {
+                                            <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Name.Substring(0, 1)</span>
+                                        }
+                                    }
+                                    <div class="ml-3">
+                                        <h6 class="mb-0">@merchant.Name</h6>
+                                    </div>
+                                </td>
+                                <td><span>@merchant.date</span></td>
+                                <td><span>PK-00<span>@merchant.Id</span></span></td>
+                                <td>@merchant.Amount</td>
+                                <td>@merchant.Duration</td>
+                                <td>@merchant.DurationType</td>
+                                <td>@merchant.Note</td>
+                                <td>
+                                    <div class="text-muted">
+                                        @foreach (var line in merchant.Features)
+                                        {
+                                        <span>@line.Name ,&nbsp;</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-icon btn-sm" title="Delete this package" onclick="confirmBlockUnblockSeller('@merchant.Id')"><i class="fa fa-trash text-danger"></i></button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("Packages Dashboard");
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+    function confirmBlockUnblockSeller(Id) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You want to delete this package.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }, function () {
+            BlockUser(Id);
+        })
+    }
+    function BlockUser(Id) {
+          $.ajax({
+            type: "GET",
+              url: "@Url.Action("DeletePackage", "Packages",new { area="Admin"})?Id=" + Id,
+              success: function (result) {
+                  if (result.Status) {
+                      location.reload();
+                    }
+                    else {
+                        swal(
+                            'Not Blocked!',
+                            result.Msg,
+                            'error'
+                        );
+                  }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+</script>

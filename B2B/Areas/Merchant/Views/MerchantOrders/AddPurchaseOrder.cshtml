@@ -1,0 +1,295 @@
+﻿@model B2B.Areas.Merchant.ViewModel.OrdersVM
+
+@{
+    Layout = "~/Areas/Merchant/Views/Shared/_LayoutMerchant.cshtml";
+}
+
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="card">
+            @using (Html.BeginForm("AddPurchaseOrder", "MerchantOrders", new { area = "Merchant" }, FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "Mainform" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body">
+                    <div class="row clearfix">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "Supplier (optional)" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @placeholder = "Phone number (* required)" })
+                                @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                @Html.TextAreaFor(m => m.DeliveryNote, new { @type = "text", @class = "form-control", @placeholder = "Purchase Note" })
+                                @Html.ValidationMessageFor(m => m.DeliveryNote, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <select class="form-control" id="itemId">
+                                    <option>Please wait...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="LineTable" style="display:none">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Unit</th>
+                                            <th>Qty</th>
+                                            <th>Cost Price</th>
+                                            <th>Total</th>
+                                            <th>Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="LineTableBody"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="text-right" colspan="4" style="border: none;"><h6>Sub Total</h6></td>
+                                            <td class="text-right" colspan="2">
+                                                <h6 id="SubTotalAmount"></h6>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 mt-3">
+                            <button class="btn btn-primary" type="submit">Confirm Order</button>
+                            <a href="@Url.Action("PurchaseOrders","MerchantOrders",new { area="Merchant"})" class="btn btn-outline-primary"><i class="fa fa-arrow-circle-left"></i>&nbsp; Back</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    var item_that_are_already_in_line = [];
+    $(document).ready(function () {
+        $("#Page_Title").html('<i class="fa fa-plus"></i> Purchase Invoice <small>re-stock inventory</small>');
+        var Products = getResponseFromUrl('GET', '@Url.Action("GetProductsApi", "MerchantOrders",new { area="Merchant"})');
+        Load_Items_DD(Products);
+        $("#itemId").change(function () {
+            var selectedItem = $(this).children("option:selected").val();
+            var checker = item_that_are_already_in_line.indexOf(parseInt(selectedItem));
+            if (checker < 0) {
+                var Item = getResponseFromUrl('GET', '/Merchant/MerchantOrders/GetProductDetail?ProductId=' + selectedItem);
+                if (Item.Status) {
+                    AddLine(Item.Data);
+                }
+                else {
+                    swal(
+                        'Server Issue',
+                        Item.Data,
+                        'error'
+                    );
+                }
+            }
+            else {
+                swal(
+                    'Duplicate Entry',
+                    'Item already in Line',
+                    'error'
+                );
+            }
+        });
+        $('form').submit(function () {
+
+            var row = 0;
+            var Noofrows = $('#LineTable tbody tr').length;
+
+            if (Noofrows <= 0) {
+                swal(
+                    "Sales with no Line!",
+                    "Lines should not be empty.",
+                    "error")
+                return false;
+            }
+            $('#LineTable').find('> tbody > tr').each(function () {
+                var column = 1;
+                $(this).find("td input").each(function () {
+                    if (column == 1) {
+                        $(this).attr('name', 'Lines[' + row + '].ProductId');
+                    }
+                    else if (column == 4) {
+                        $(this).attr('name', 'Lines[' + row + '].Qty');
+                    }
+                    else if (column == 5) {
+                        $(this).attr('name', 'Lines[' + row + '].Price');
+                    }
+                    else if (column == 6) {
+                        $(this).attr('name', 'Lines[' + row + '].LineTotal');
+                    }
+                    column++;
+                });
+                row++;
+            });
+
+            return true
+        })
+    })
+    var UpdateSubTotal = function () {
+        var SubTotal = 0;
+        $('.Amount').each(function () {
+            var amount = parseInt($(this).val());
+            SubTotal = SubTotal + amount;
+        })
+        $('#SubTotalAmount').html(SubTotal);
+    }
+    function AddLine(response) {
+        var Qty = response.Qty;
+        var Cost = response.Cost;
+        var ProductId = response.ProductId;;
+        var ProductName = response.ProductName;
+        var UnitName = response.Unit;
+        $('#LineTable > tbody').append('<tr>' +
+            '<td><input type="hidden" value="' + ProductId + '">' +
+            '<input class="form-control text-box single-line" type="text" value="' + ProductName + '" readonly></td>' +
+            '<td><input class="form-control text-box single-line" id="No" type="text" value="' + UnitName + '" readonly></td>' +
+            '<td><input class="form-control text-box single-line QtyLine" id="No" type="text" value="1" min="1" onkeypress="return valid_math_number()" onkeyup="remove_dots(this)" required></td>' +
+            '<td><input class="form-control text-box single-line Price" id="No" type="text" value="' + Cost + '" min="1" onkeypress="return valid_math_number()" onkeyup="remove_dots(this)" required></td>' +
+            '<td><input class="form-control text-box single-line Amount" id="No" type="number" value="' + Cost + '" readonly></td>' +
+            '<td><button type="button" class="btn btn-icon btn-sm" title="Delete this line" id="DeleteLineBtn"><i class="fa fa-trash text-danger"></i></button>'+
+            '</td></tr>');
+        item_that_are_already_in_line.push(ProductId);
+        $('#LineTable').show(500);
+        UpdateSubTotal();
+    }
+    $(document).on('click', '#DeleteLineBtn', function () {
+        var id = $(this).parents('tr').find('input[type="hidden"]').val();
+        var index = item_that_are_already_in_line.indexOf(parseInt(id));
+        if (index > -1) {
+            item_that_are_already_in_line.splice(index, 1);
+        }
+        $(this).parents('tr').first().remove();
+        var rowCount = $('#LineTable >tbody >tr').length;
+        if (parseInt(rowCount) <= 0) {
+            $("#LineTable").hide(500);
+        }
+        UpdateSubTotal();
+    });
+    $(document).on('input', '.QtyLine', function () {
+        var Qty = $(this).val();
+        var Total = $(this).parents('tr').find('input[class="form-control text-box single-line Amount"]');
+        var Price = $(this).parents('tr').find('input[class="form-control text-box single-line Price"]').val();
+        $(this).parents('tr').find('input[class="form-control text-box single-line AmountCalculator"]').val(0);
+        CalculateTotalAmount(Qty, Price, Total);
+        UpdateSubTotal();
+    });
+    $(document).on('input', '.Price', function () {
+        var Price = $(this).val();
+        var Total = $(this).parents('tr').find('input[class="form-control text-box single-line Amount"]');
+        var Qty = $(this).parents('tr').find('input[class="form-control text-box single-line QtyLine"]').val();
+        CalculateTotalAmount(Qty, Price, Total);
+        UpdateSubTotal();
+    });
+    var CalculateTotalAmount = function (Qty, UnitPrice, Total) {
+        Total.val('0');
+        if (parseInt(Qty) > 0 && Qty != '' && UnitPrice != '' && parseInt(UnitPrice) > 0) {
+            var TotalAmount = parseInt(Qty) * parseInt(UnitPrice);
+            //Set Amount
+            Total.val(TotalAmount);
+        }
+        else {
+            swal(
+                'Invalid Field',
+                'Qty or unit price should not be empty.',
+                'error'
+            );
+        }
+    }
+    function valid_math_number() {
+        return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46;
+    }
+    function remove_zeros(elem) {
+        var val = $(elem).val();
+        var tmp = val.replace(/^0+/, '0');
+        if (tmp.charAt(0) == 0 && tmp.charAt(1) > 0) {
+            tmp = 0;
+        }
+        $(elem).val(tmp);
+    }
+    function remove_dots(elem) {
+        var val = $(elem).val();
+        var tmp = val.replace(/^0+/, '0');
+        fixer = 0;
+        if (val.includes(".")) {
+            if (tmp.charAt(0) == ".") {
+                $(elem).val(fixer);
+
+            }
+            // IF DOUBLE MINUS APPEARS
+            else if ((val.match(/\./g).length) > 1) {
+                $(elem).val(fixer);
+
+            }
+        }
+    }
+    function math_fix(val, id) {
+        var contains_dot = false;
+        var contains_minus = false;
+        var contains_plus = false;
+        var fixer = 0;
+        var length = 0;
+        //------| CHECKING MINUS FOR DUPLICATIONS |------\\
+        if (val.includes("-")) {
+            // IF DOUBLE MINUS APPEARS
+            if (val.charAt(0) != "-" && val.includes("-")) {
+                $("#" + id).val(fixer);
+            }
+            else if ((val.match(/-/g).length) > 1) {
+                $("#" + id).val(fixer);
+            }
+            contains_minus = true;
+        }
+        //------| CHECKING POINT(DOT) FOR DUPLICATIONS |------\\
+        if (val.includes("+")) {
+            // IF DOUBLE MINUS APPEARS
+            if (val.charAt(0) != "+" && val.includes("+")) {
+                $("#" + id).val(fixer);
+            }
+            else if ((val.match(/\+/g).length) > 1) {
+                $("#" + id).val(fixer);
+            }
+            contains_dot = true;
+        }
+    }
+    function valid_number() {
+        return event.charCode >= 48 && event.charCode <= 57;
+    }
+    function Load_Items_DD(response) {
+        $('#itemId').html('');
+        $('#itemId').append('<option value="" selected disabled>select a product</option>');
+        //Extract Data List
+        $(response).each(function () {
+            $('#itemId').append('<option value="' + this.Id + '">' + this.Name + '</option>');
+        });
+    }
+    var getResponseFromUrl = function (requestType, requestUrl, requestData = null) {
+
+        var response;
+        $.ajax({
+            type: requestType,
+            url: requestUrl,
+            data: requestData,
+            async: false,
+            success: function (data) {
+                response = data;
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+        return response;
+    }
+</script>

@@ -1,0 +1,118 @@
+﻿@model IEnumerable<B2B.Areas.Admin.ViewModel.CategoryVM>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header" style="display:block">
+                <h3 class="card-title" style="float:left">Catalog List</h3>
+                <a href="@Url.Action("Create","Catalog",new { area="Admin"})" class="btn btn-default" style="float:right">Create new catalog</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="catalog_table"  style="margin-bottom: 15px;margin-top: 11px;">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Catalog ID</th>
+                                <th>Parent Category</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var catalog in Model)
+                            {
+                                <tr>
+                                    <td class="d-flex">
+                                        @if (catalog.ImageUrl == null)
+                                        {
+                                            <span class="avatar avatar-blue" data-toggle="tooltip" title="" data-original-title="@catalog.Name">@catalog.Name.Substring(0, 2)</span>
+                                        }
+                                        else
+                                        {
+                                            if (File.Exists(Server.MapPath("~" + catalog.ImageUrl)))
+                                            {
+                                                <img class="avatar" src="@catalog.ImageUrl" data-toggle="tooltip" title="" data-original-title="@catalog.Name">
+                                            }
+                                            else
+                                            {
+                                                <span class="avatar avatar-red" data-toggle="tooltip" title="" data-original-title="@catalog.Name">@catalog.Name.Substring(0, 2)</span>
+                                            }
+                                        }
+                                        <div class="ml-3">
+                                            <h6 class="mb-0">@catalog.Name</h6>
+                                        </div>
+                                    </td>
+                                    <td><span>CAT-00<span>@catalog.Id</span></span></td>
+                                    <td><span>@catalog.ParentCategoryName</span></td>
+                                    <td>
+                                        <a href="@Url.Action("Edit","Catalog",new { area="Admin",id=catalog.Id})" class="btn btn-primary btn-sm" ><i class="fa fa-pencil"></i></a>
+                                        <a href="#" class="btn btn-danger btn-sm" onclick="DeleteCatalog('@catalog.Id')"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("My Catalogs");
+    })
+    $('#catalog_table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+    var getResponseFromUrl = function (requestType, requestUrl, requestData = null) {
+
+        var response;
+        $.ajax({
+            type: requestType,
+            url: requestUrl,
+            data: requestData,
+            async: false,
+            success: function (data) {
+                response = data;
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+        return response;
+    }
+    function DeleteCatalog(Id) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You want to delete this catalog.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }, function () {
+            var response = getResponseFromUrl('GET', '@Url.Action("DeleteCatalog", "Catalog",new { area="Admin"})?id=' + Id);
+            if (response.code == 200) {
+                location.reload();
+            }
+            else {
+                swal(
+                    'Error!',
+                    response.msg,
+                    'error'
+                );
+            }
+        })
+    }
+</script>

@@ -1,0 +1,29 @@
+﻿<div id="header_top" class="header_top">
+    <div class="container">
+        <div class="hleft">
+            <a class="header-brand" href="@Url.Action("Add","Orders",new { area="Supervisor"})"><i class="fe fe-command brand-logo"></i></a>
+            <div class="dropdown">
+                <a href="@Url.Action("ViewCarts","Orders",new { area="Supervisor"})" class="nav-link icon xs-hide"><i class="fa fa-shopping-basket"></i></a>
+                <a href="@Url.Action("Add","Orders",new { area="Supervisor"})" class="nav-link icon app_file xs-hide"><i class="fa fa-opencart"></i></a>
+            </div>
+        </div>
+        <div class="hright">
+            <div class="dropdown">
+                <a href="javascript:void(0)" class="nav-link icon menu_toggle"><i class="fa  fa-align-left"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="left-sidebar" class="sidebar ">
+    <h5 class="brand-name">Business <a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
+    <nav id="left-sidebar-nav" class="sidebar-nav">
+        <ul class="metismenu">
+            <li class=""><a href="@Url.Action("Add","Orders",new { area="Supervisor"})"><i class="fa fa-opencart"></i><span>Marketplace</span></a></li>
+            <li class=""><a href="@Url.Action("AuthOrders","Orders",new { area="Supervisor"})"><i class="fa fa-bell-o"></i><span>Pending Approvals</span></a></li>
+            <li class=""><a href="@Url.Action("ManageOrders","Orders",new { area="Supervisor"})"><i class="fa fa-list"></i><span>My Orders</span></a></li>
+            <li class=""><a href="@Url.Action("OrdersReport","Orders",new { area="Supervisor"})"><i class="icon-bar-chart"></i><span>Orders Reports</span></a></li>
+        </ul>
+    </nav>
+</div>
+
+

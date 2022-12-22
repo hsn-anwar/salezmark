@@ -1,0 +1,308 @@
+﻿@model List<B2B.Areas.Supermarket.ViewModel.MarketProductDtos>
+
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Supermarket/Views/Shared/_SupermarketLayout.cshtml";
+}
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="row clearfix">
+            <div class="col-12">
+                <form action="@Url.Action("Add","Orders",new { area="Supermarket"})" method="get">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-5 col-sm-6">
+                                    <label>Search</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search...  (optional)" name="search">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <label>Category</label>
+                                    <div class="form-group">
+                                        @Html.DropDownList("categoryId", (IEnumerable<SelectListItem>)ViewBag.categoryId, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <label>Price</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Min. Price (optional)" name="minPrice">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <label>&nbsp;</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Max. Price (optional)" name="maxPrice">
+                                    </div>
+                                </div>
+                                <div class="col-lg-1 col-md-3 col-sm-6">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-sm btn-primary btn-block" title="" style="line-height:27px!important">Filter</button>
+                                </div>
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <label>&nbsp;</label>
+                                    <a href="@Url.Action("ViewCarts","Orders",new { area="Supermarket"})" class="btn btn-sm btn-primary btn-block" title="" style="line-height:27px!important">View Cart</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            @foreach (B2B.Areas.Supermarket.ViewModel.MarketProductDtos line in Model)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="card">
+                        <div class="card-body ribbon" style="padding:15px 15px!important">
+                            @if (line.OnSale)
+                            {
+                                <div class="ribbon-box green">@Convert.ToDouble(String.Format("{0:0.00}", line.Discount)) % off</div>
+                            }
+                            else if (line.IsNew)
+                            {
+                                <div class="ribbon-box orange">New</div>
+                            }
+                            <img class="img-thumbnail" src="@line.FeatureImageUrl" alt="" style="width: 100%;height: 265px;object-fit: cover;">
+                            <h5 class="mt-2 mb-0" style="color:#1A5089">@line.Name</h5>
+                            <h7 class="mt-0 mb-0" style="color:#1A5089">@line.CompanyName</h7>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    @if (line.OnSale)
+                                    {
+                                        <p class="mt-2 mb-0" style="font-weight:700;margin-top:5px!important"><del style="color: #eb737f;font-size: 13px;">$@Convert.ToDouble(String.Format("{0:0.00}", line.ActualPrice))</del> <span style="color: #1A5089;font-size: 18px;">$@Convert.ToDouble(String.Format("{0:0}", line.SalePrice))</span></p>
+                                    }
+                                    else
+                                    {
+                                        <h6 class="mt-2 mb-0" style="color: #1A5089;font-size: 18px;font-weight:700;margin-top:5px!important">$@Convert.ToDouble(String.Format("{0:0.00}", line.SalePrice))</h6>
+                                    }
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button class="btn btn-default btn-sm" style="width:100%" onclick="OpenModal('@line.Description','@line.Specification','@line.Id')"><i class="fa fa-eye"></i> View</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-default btn-sm" style="width:100%" onclick="OpenBuyModal('@line.Description','@line.Specification','@line.Id')"><i class="fa fa-shopping-cart"></i> Buy</button>
+                                </div>
+                            </div>
+                            <div class="row text-center mt-3">
+                                @if (line.Tax != null)
+                                {
+                                    <label style="font-size:12px;font-weight: 500; color:forestgreen">Tax included (@Convert.ToDouble(String.Format("{0:0.00}", line.Tax)) %)</label>
+                                }
+                                <label style="font-size:12px;font-weight: 500;color:#1A5089">@line.InStock products Availiable</label>
+                                <progress id="file" value="@line.InStock" max="@line.TotalStock" style="width:100%;height:20px"> </progress>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div id="ProView" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add to cart</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <form id="CartForm">
+
+                        <label>
+                            Qty
+                        </label>
+                        <div class="form-control">
+                            <input type="number" name="qty" id="PQty" class="form-control" value="1" min="1"/>
+                            <input type="hidden" name="productId" id="PID" class="form-control" />
+                        </div>
+                    </form>
+                </div>
+                <br />
+                <div>
+                    <ul class="nav nav-tabs page-header-tab">
+                        <li class="nav-item"><a class="nav-link active" id="Accounts-tab" data-toggle="tab" href="#Accounts-Invoices">Description</a></li>
+                        <li class="nav-item"><a class="nav-link" id="Accounts-tab" data-toggle="tab" href="#Accounts-Payments">Specification</a></li>
+                    </ul>
+                </div>
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade active show" id="Accounts-Invoices" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <p id="Description-Paragraph"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Accounts-Payments" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <p id="Specification-Paragraph"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="AddInCart(1)">Add to cart</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Modal -->
+<div id="BuyNowView" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Buy Now</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <form id="BuyCartForm">
+
+                        <label>
+                            Qty
+                        </label>
+                        <div class="form-control">
+                            <input type="number" name="bqty" id="BQty" min="1" value="1" class="form-control" />
+                            <input type="hidden" name="bproductId" id="BPID" class="form-control" />
+                        </div>
+                    </form>
+                </div>
+                <br />
+                <div>
+                    <ul class="nav nav-tabs page-header-tab">
+                        <li class="nav-item"><a class="nav-link active" id="Accounts-tab" data-toggle="tab" href="#Accounts-Invoices">Description</a></li>
+                        <li class="nav-item"><a class="nav-link" id="Accounts-tab" data-toggle="tab" href="#Accounts-Payments">Specification</a></li>
+                    </ul>
+                </div>
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade active show" id="Accounts-Invoices" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <p id="BDescription-Paragraph"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Accounts-Payments" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <p id="BSpecification-Paragraph"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="AddInCart(2)">Buy Now</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("Marketplace");
+    })
+    function OpenModal(Des, Spec, Id) {
+        $("#Description-Paragraph").html(Des);
+        $("#Specification-Paragraph").html(Spec);
+        $("#PID").val(Id);
+        $("#ProView").modal('show');
+    }
+    function OpenBuyModal(Des, Spec, Id) {
+        $("#BDescription-Paragraph").html(Des);
+        $("#BSpecification-Paragraph").html(Spec);
+        $("#BPID").val(Id);
+        $("#BuyNowView").modal('show');
+    }
+    function AddInCart(flag) {
+        if (flag == 1) {
+            var Qty = parseFloat($("#PQty").val());
+            if (Qty == NaN || Qty <= 0 || $("#PQty").val()=="") {
+                swal(
+                    'Validation error!',
+                    'Qty must be greater than zero (0).',
+                    'error'
+                );
+            }
+            else {
+                AddInCartAjax();
+            }
+        }
+        else if (flag == 2) {
+            var BQty = parseFloat($("#BQty").val());
+            if (BQty == NaN || BQty <= 0 || $("#BQty").val()=="") {
+                swal(
+                    'Validation error!',
+                    'Qty must be greater than zero (0).',
+                    'error'
+                );
+            }
+            else {
+                BuyNowAjax();
+            }
+        }
+        
+    }
+    function AddInCartAjax() {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("addtocart", "Orders", new { area="Supermarket"})",
+            data: $("#CartForm").serialize(),
+            success: function (result) {
+                if (result.code==200) {
+                    $('#ProView').modal('toggle');
+                    swal(
+                        'Added into cart.',
+                        result.msg,
+                        'success'
+                    );
+                }
+                else {
+                    swal(
+                        'Not added',
+                        result.msg,
+                        'error'
+                    );
+                }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+    function BuyNowAjax() {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("buyNow", "Orders", new { area="Supermarket"})",
+            data: $("#BuyCartForm").serialize(),
+            success: function (result) {
+                debugger
+                if (result.code == 200) {
+                    window.location = "@Url.Action("ViewCart", "Orders",new { area="Supermarket"})?id=" + result.msg;
+                }
+                else {
+                    swal(
+                        'Not added',
+                        result.msg,
+                        'error'
+                    );
+                }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+</script>

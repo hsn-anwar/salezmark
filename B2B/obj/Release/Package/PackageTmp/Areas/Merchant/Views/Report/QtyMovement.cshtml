@@ -1,0 +1,63 @@
+﻿@model List<B2B.Areas.Merchant.ViewModel.QtyMovementReportVM>
+@{
+    Layout = "~/Areas/Merchant/Views/Shared/_LayoutMerchant.cshtml";
+}
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header" style="display:block">
+                <h3 class="card-title" style="float:left"><i class='fa fa-eye' style="color:#E21E32 !important"></i> &nbsp; Qty movement report</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Transaction Type</th>
+                                <th>Order Number</th>
+                                <th>In Qty</th>
+                                <th>Out Qty</th>
+                                <th>Cost</th>
+                                <th>Sale Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+
+                                    <td><span>@merchant.TransactionType</span></td>
+                                    <td><span>@merchant.OrderNumber</span></td>
+                                    <td>@merchant.In</td>
+                                    <td>@merchant.Out</td>
+                                    <td>@merchant.Cost</td>
+                                    <td>@merchant.Price</td>
+                                    <td>@merchant.Total</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("Generator","Report",new { area="Merchant",flag=6})" class="btn btn-outline-primary"><i class="fa fa-backward"></i> &nbsp; Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html(" Qty Movement Report");
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+</script>
+

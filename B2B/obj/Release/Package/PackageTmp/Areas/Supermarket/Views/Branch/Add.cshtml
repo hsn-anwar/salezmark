@@ -1,0 +1,242 @@
+﻿@model B2B.Areas.Api.Dtos.BranchDtos
+@{
+    Layout = "~/Areas/Supermarket/Views/Shared/_SupermarketLayout.cshtml";
+}
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="card">
+            @using (Html.BeginForm("Add", "Branch", new { area = "Supermarket" }, FormMethod.Post, new { @class = "form-horizontal", role = "form", @enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body">
+                    <div class="row clearfix">
+                        <div class="col-lg-12" style="padding-bottom: 25px;">
+                            <h5>Branch Image</h5>
+                            <input type="file" class="dropify" name="ImageFile" id="ImageFile">
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Branch name</label>
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @placeholder = "Name *(required)" })
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Phone number</label>
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @placeholder = "Phone", @type = "number" })
+                                @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12" id="GoogleAutoComplete">
+                            <div class="form-group">
+                                <label class="form-label">Search Address</label>
+                                <input id="autocomplete_search" onkeyup="clear_map()" name="autocomplete_search" type="text" class="form-control" placeholder="Search Location" />
+                            </div>
+                            @Html.HiddenFor(model => model.Latitude)
+                            @Html.HiddenFor(model => model.Longitude)
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <div id="map" style="display:none"></div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Country</label>
+                                @Html.TextBoxFor(m => m.Country, new { @class = "form-control", @placeholder = "Country" })
+                                @Html.ValidationMessageFor(m => m.Country, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">City</label>
+                                @Html.TextBoxFor(m => m.City, new { @class = "form-control", @placeholder = "State" })
+                                @Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">State</label>
+                                @Html.TextBoxFor(m => m.State, new { @class = "form-control", @placeholder = "City" })
+                                @Html.ValidationMessageFor(m => m.State, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                @Html.TextBoxFor(m => m.AddressLine, new { @class = "form-control", @placeholder = "Any Parmanent Address", @type = "text" })
+                                @Html.ValidationMessageFor(m => m.AddressLine, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12 mt-3">
+                            <button class="btn btn-primary" type="submit">Save</button>
+                            <a href="@Url.Action("Index","Branch",new { area="Supermarket"})" class="btn btn-outline-primary"><i class="fa fa-backward"></i> &nbsp; Back</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script async defer type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4IpjU3TNcaowegTbemzdinkWCUGQBFdc&libraries=places&callback=initMap"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("Add new <small> branch to manage supervisor</small>");
+        $("#map").show();
+    })
+    $(document).ready(function () {
+        $(window).keydown(function (event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+            }
+        });
+        $('form').on('submit', function (event) {
+            var clat = $("#Latitude").val();
+            var clng = $("#Longitude").val();
+            if (clat == '' && clng == '') {
+                swal("Location not found!", "Please select any live location", "error");
+                return false;
+            } else {
+                return true;
+            }
+        });
+    })
+    var geocoder;
+    function clear_map() {
+        var input = $("#autocomplete_search").val();
+        if (input == "") {
+            $("#Latitude").val('');
+            $("#Longitude").val('');
+            $("#Country").val('');
+            $("#State").val('');
+            $("#City").val('');
+            $("#map").hide();
+        }
+    }
+    function initMap() {
+        $("#map").hide();
+
+        search_lat = "";
+        search_lng = "";
+        formattedAddress = "";
+        var marker;
+        var input = document.getElementById('autocomplete_search');
+        geocoder = new google.maps.Geocoder();
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.addListener('place_changed', function () {
+            $("#map").show();
+
+            var place = autocomplete.getPlace();
+            // place variable will have all the information you are looking for.
+            $('#Latitude').val(place.geometry['location'].lat());
+            $('#Longitude').val(place.geometry['location'].lng());
+            search_lat = place.geometry['location'].lat();
+            search_lng = place.geometry['location'].lng();
+
+            setCountryStateCity(place, false);
+            // SETTING LAT LNG
+            $("#Latitude").val(search_lat);
+            $("#Longitude").val(search_lng);
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 18,
+                center: { lat: search_lat, lng: search_lng }
+            });
+            marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                zoom: 18,
+                animation: google.maps.Animation.DROP,
+                position: { lat: search_lat, lng: search_lng }
+            });
+            marker.addListener('click', toggleBounce);
+            markerCoords(marker);
+        });
+
+        function toggleBounce() {
+            if (marker.getAnimation() !== null) {
+                marker.setAnimation(null);
+            } else {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+            }
+        }
+    }
+    function markerCoords(markerobject) {
+        google.maps.event.addListener(markerobject, 'dragend', function (evt) {
+
+
+            var newlat = evt.latLng.lat().toFixed(3);
+            var newlng = evt.latLng.lng().toFixed(3);
+            geocoder.geocode({
+                latLng: new google.maps.LatLng(newlat, newlng)
+            }, function (responses) {
+                if (responses && responses.length > 0) {
+                    setCountryStateCity(responses, true);
+                } else {
+                    console.log('Cannot determine address at this location.');
+                }
+            });
+            $("#Latitude").val(newlat);
+            $("#Longitude").val(newlng);
+
+        });
+        google.maps.event.addListener(markerobject, 'drag', function (evt) {
+            console.log("marker is being dragged");
+        });
+    }
+    function setCountryStateCity(responses, isMarkerAddress) {
+        var country;
+        var state;
+        var city;
+        var zone;
+        var postal;
+        var Line1;
+        var Line2;
+        var Address;
+
+        var data;
+        if (isMarkerAddress) {
+            data = responses[1];
+        } else {
+            data = responses;
+        }
+        $.each(data.address_components, function (index, val) {
+            $.each(val.types, function (cindex, cval) {
+                //country
+                if (cval == "country") {
+                    country = val.long_name;
+                }
+                //state
+                else if (cval == "administrative_area_level_1") {
+                    state = val.long_name;
+                }
+                //City
+                else if (cval == "administrative_area_level_2") {
+                    city = val.long_name;
+                }
+                //Zone
+                else if (cval == "administrative_area_level_3") {
+                    zone = val.long_name;
+                }
+                //Postal
+                else if (cval == "postal_code") {
+                    postal = val.long_name;
+                }
+                else if (cval == "sublocality_level_1") {
+                    Line1 = val.long_name;
+                }
+                else if (cval == "sublocality_level_2") {
+                    Line2 = val.long_name;
+                }
+                else if (cval == "premise") {
+                    Address = val.long_name;
+                }
+            })
+        })
+        $('#City').val(city);
+        $('#Country').val(country);
+        $('#State').val(state);
+    }
+</script>
+

@@ -1,0 +1,79 @@
+﻿@model List<B2B.Areas.Merchant.ViewModel.ProductsVM>
+@{
+    Layout = "~/Areas/Merchant/Views/Shared/_LayoutMerchant.cshtml";
+}
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header" style="display:block">
+                <h3 class="card-title" style="float:left"><i class='fa fa-eye' style="color:#E21E32 !important"></i> &nbsp; In stock</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Cost</th>
+                                <th>Actual Price</th>
+                                <th>Tax</th>
+                                <th>Discount</th>
+                                <th>Sale</th>
+                                <th>In Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+                                    <td class="d-flex">
+                                        @if (merchant.FeatureImageUrl == null)
+                                        {
+                                            <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Name.Substring(0, 1)</span>
+                                        }
+                                        else
+                                        {
+                                            if (File.Exists(Server.MapPath("~" + merchant.FeatureImageUrl)))
+                                            {
+                                                <img class="avatar" src="@merchant.FeatureImageUrl" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">
+                                            }
+                                            else
+                                            {
+                                                <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Name.Substring(0, 1)</span>
+                                            }
+                                        }
+                                        <div class="ml-3">
+                                            <h6 class="mb-0">@merchant.Name</h6>
+                                            <span>@merchant.StoreMeasurementUnitName</span>
+                                        </div>
+                                    </td>
+                                    <td><span>@merchant.Cost</span></td>
+                                    <td><span>@merchant.ActualPrice</span></td>
+                                    <td>@merchant.Tax</td>
+                                    <td>@merchant.Discount</td>
+                                    <td>@merchant.SalePrice</td>
+                                    <td><span class="tag tag-danger" style="background-color: forestgreen!important">@merchant.InStock</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html(" Product in Stock Report");
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+</script>

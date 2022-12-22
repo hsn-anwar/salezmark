@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="icon" href="http://puffintheme.com/demo/epic/hr/laravel/public/assets/images/favicon.ico" type="image/x-icon"> <!-- Favicon-->
+    <title>Admin - B2B</title>
+    <meta name="author" content="Assort">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/Content/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/plugins/sweetalert/sweetalert.css">
+    <link rel="stylesheet" href="~/Content/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
+    <link rel="stylesheet" href="~/Content/plugins/dropify/css/dropify.min.css">
+    <link rel="stylesheet" href="~/Content/css/main.css">
+    <link rel="stylesheet" href="~/Content/css/theme1.css">
+</head>
+
+<body class="font-montserrat">
+
+    <!-- Page Loader -->
+    <div class="page-loader-wrapper">
+        <div class="loader">
+        </div>
+    </div>
+
+    <div id="main_content">
+        @{
+            Html.RenderAction("ViewSidebar", "Home", new { area = "Admin" });
+        }
+        <div class="page">
+            <div id="page_top" class="section-body">
+                <div class="container-fluid">
+                    <div class="page-header">
+                        <div class="left">
+                            <h1 class="page-title" id="Page_Title">Control Panel</h1>
+                        </div>
+                        <div class="right">
+                            <div class="notification d-flex">
+                                <div class="dropdown d-flex">
+                                    <a class="nav-link icon d-none d-md-flex btn btn-default btn-icon ml-1" data-toggle="dropdown"><i class="fa fa-bell"></i><span class="badge badge-primary nav-unread"></span></a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                        <ul class="list-unstyled feeds_widget">
+                                            <li>
+                                                <div class="feeds-left"><i class="fa fa-check"></i></div>
+                                                <div class="feeds-body">
+                                                    <h4 class="title text-danger">Coming soon <small class="float-right text-muted">Time</small></h4>
+                                                    <small>To enable notification first you need to complete your mobile app.</small>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <div class="dropdown-divider"></div>
+                                        <a href="javascript:void(0)" class="dropdown-item text-center text-muted-dark readall">No need to mark as read</a>
+                                    </div>
+                                </div>
+                                <div class="dropdown d-flex">
+                                    <a class="nav-link icon d-none d-md-flex btn btn-default btn-icon ml-1" data-toggle="dropdown"><i class="fa fa-user"></i></a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                        <a class="dropdown-item" href="#"><i class="dropdown-icon fe fe-settings"></i> Settings (coming soon)</a>
+                                        <div class="dropdown-divider"></div>
+                                        @using (Html.BeginForm("LogOff", "Account", new { area = "" }, FormMethod.Post, new { id = "logoutForm", @class = "dropdown-item" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <a href="javascript:document.getElementById('logoutForm').submit()">
+                                                <i class="dropdown-icon fe fe-log-out"></i>
+                                                Sign out
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @RenderBody()
+        </div>
+    </div>
+
+
+
+    <!-- Scripts -->
+    <script src="~/Content/bundles/lib.vendor.bundle.js"></script>
+    <script src="~/Content/bundles/counterup.bundle.js"></script>
+    <script src="~/Content/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="~/Content/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/plugins/dropify/js/dropify.min.js"></script>
+    <script src="~/Content/js/core.js"></script>
+    <script src="~/Content/js/page/dialogs.js"></script>
+    <script src="~/Content/js/form/dropify.js"></script>
+</body>
+
+</html>

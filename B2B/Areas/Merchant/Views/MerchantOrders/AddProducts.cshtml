@@ -1,0 +1,187 @@
+﻿@model B2B.Areas.Merchant.ViewModel.ProductsVM
+
+@{
+    Layout = "~/Areas/Merchant/Views/Shared/_LayoutMerchant.cshtml";
+}
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="card">
+            @using (Html.BeginForm("AddProducts", "MerchantOrders", new { area = "Merchant" }, FormMethod.Post, new { @class = "form-horizontal", role = "form", @enctype = "multipart/form-data",@id= "OrderForm" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body">
+                    <div class="row clearfix">
+                        <div class="col-lg-12" style="padding-bottom: 25px;">
+                            <h5>Product Picture</h5>
+                            <input type="file" class="dropify" name="ImageFile" id="ImageFile">
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Name</label>
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @placeholder = "Name *(required)" })
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Meaurement unit</label>
+                                @Html.DropDownList("StoreMeasurementUnitId", (IEnumerable<SelectListItem>)ViewBag.StoreMeasurementUnitList, new { @class = "form-control", @id = "StoreMeasurementUnitId" })
+                                @Html.ValidationMessageFor(m => m.StoreMeasurementUnitId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Select company</label>
+                                @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.CompanyList, new { @class = "form-control", @id = "CompanyId" })
+                                @Html.ValidationMessageFor(m => m.StoreMeasurementUnitId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Select category</label>
+                                @Html.DropDownList("CategoryId", (IEnumerable<SelectListItem>)ViewBag.CategoryList, new { @class = "form-control", @id = "CategoryId" })
+                                @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Low stock</label>
+                                @Html.TextBoxFor(m => m.LowStock, new { @type = "number", @class = "form-control", @placeholder = "Stock Level" })
+                                @Html.ValidationMessageFor(m => m.LowStock, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Cost ($)</label>
+                                @Html.TextBoxFor(m => m.Cost, new { @type = "number", @class = "form-control", @placeholder = "Cost of good", @id="Cost" })
+                                @Html.ValidationMessageFor(m => m.Cost, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Actual price ($)</label>
+                                @Html.TextBoxFor(m => m.ActualPrice, new { @type = "number", @class = "form-control Calculation", @placeholder = "Actual Price *(required)", @id = "ActualPrice" })
+                                @Html.ValidationMessageFor(m => m.ActualPrice, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Tax (%)</label>
+                                @Html.TextBoxFor(m => m.Tax, new { @type = "number", @class = "form-control Calculation", @placeholder = "Tax *(required)", @id = "Tax" })
+                                @Html.ValidationMessageFor(m => m.Tax, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Discount (%)</label>
+                                @Html.TextBoxFor(m => m.Discount, new { @type = "number", @class = "form-control Calculation", @placeholder = "Discount *(required)", @id = "Discount" })
+                                @Html.ValidationMessageFor(m => m.Discount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Sale price ($)</label>
+                                @Html.TextBoxFor(m => m.SalePrice, new { @type = "number", @class = "form-control Calculation", @placeholder = "Sale Price *(required)", @readonly="true", @id="SalePrice" })
+                                @Html.ValidationMessageFor(m => m.SalePrice, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", @placeholder = "Short Description", @type = "text", @rows = "6" })
+                                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">Specification</label>
+                                @Html.TextAreaFor(m => m.Specification, new { @class = "form-control", @placeholder = "Specification", @type = "text", @rows = "6" })
+                                @Html.ValidationMessageFor(m => m.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12 mt-3">
+                            <button class="btn btn-primary" type="submit">Save</button>
+                            <a href="@Url.Action("Products","MerchantOrders",new { area="Merchant"})" class="btn btn-outline-primary" type="button"><i class="fa fa-arrow-circle-o-left"></i> &nbsp; Back</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("<i class='fa fa-plus'></i> Add new product");
+    })
+    $("#OrderForm").submit(function (e) {
+
+        var unit = $("#StoreMeasurementUnitId").val();
+        var company = $("#CompanyId").val();
+        var category = $("#CategoryId").val();
+        if (unit == "" || unit == undefined || unit == null) {
+            swal(
+                'Invalid Measurement unit',
+                'Please select measurement unit to add product',
+                'error'
+            );
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        }
+        else if (category == "" || category == null || category == undefined) {
+            swal(
+                'Invalid Category',
+                'Please select category to add product',
+                'error'
+            );
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        }
+        else if (company == "" || company == null || company == undefined) {
+            swal(
+                'Invalid Company',
+                'Please select company to add product',
+                'error'
+            );
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        }   
+        else {
+            return true;
+        }
+    });
+    $(document).on('input', '.Calculation', function () {
+        var Cost = parseFloat($("#Cost").val());
+        var ActualPrice = parseFloat($("#ActualPrice").val());
+        var Tax = parseFloat($("#Tax").val());
+        var Discount = parseFloat($("#Discount").val());
+        
+        var TotalTax = 0;
+        var TotalDiscount = 0;
+        var SalePriceCal = 0;
+
+        if (ActualPrice > 0 && ActualPrice != NaN && ActualPrice != undefined) {
+
+            if (Tax > 0 && Tax <= 100 && Tax != NaN && Tax != undefined) {
+                TotalTax = getPerValue(Tax, ActualPrice);
+            }
+            else {
+                $("#Tax").val("");
+            }
+            if (Discount > 0 && Discount <= 100 && Discount != NaN && Discount != undefined) {
+                TotalDiscount = getPerValue(Discount, ActualPrice);
+            }
+            else {
+                $("#Discount").val("");
+            }
+            SalePriceCal = (ActualPrice - TotalDiscount) + TotalTax;
+        }
+        $("#SalePrice").val(SalePriceCal);
+    });
+    var getPerValue = function (percentage, actual) {
+        var responseValue = 0;
+        if (percentage > 0 && percentage != undefined && actual > 0 && actual != undefined && actual != null && percentage != null) {
+            responseValue = (percentage * actual) / 100;
+        }
+        return responseValue;
+    }
+
+</script>

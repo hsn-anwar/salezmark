@@ -1,0 +1,89 @@
+﻿
+
+<div id="header_top" class="header_top">
+    <div class="container">
+        <div class="hleft">
+            <a class="header-brand" href="index.html"><i class="fe fe-command brand-logo"></i></a>
+            <div class="dropdown">
+                <a href="@Url.Action("Index","MerchantUsers",new { area="Merchant"})" class="nav-link icon xs-hide"><i class="fa fa-id-card-o"></i></a>
+                <a href="@Url.Action("ReceivedOrders","MerchantOrders",new { area="Merchant"})" class="nav-link icon app_file xs-hide"><i class="fa fa-list"></i></a>
+            </div>
+        </div>
+        <div class="hright">
+            <div class="dropdown">
+                <a href="javascript:void(0)" class="nav-link icon menu_toggle"><i class="fa  fa-align-left"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="left-sidebar" class="sidebar ">
+    <h5 class="brand-name">Portal <a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
+    <nav id="left-sidebar-nav" class="sidebar-nav">
+        <ul class="metismenu">
+            <li class="g_heading">POS</li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-list"></i><span>Orders</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("GenerateOfflineOrder","MerchantOrders",new { area="Merchant"})">Generate order</a></li>
+                    <li class=""><a href="@Url.Action("ReceivedOrders","MerchantOrders",new { area="Merchant"})">Orders received</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="fa fa-first-order"></i><span>Purchases</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("AddPurchaseOrder","MerchantOrders",new { area="Merchant"})">Purchase inventory</a></li>
+                    <li class=""><a href="@Url.Action("PurchaseOrders","MerchantOrders",new { area="Merchant"})">My purchases</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-users"></i><span>Delivery Team</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("AddDeliveryBoy","MerchantUsers",new { area="Merchant"})">Add new</a></li>
+                    <li class=""><a href="@Url.Action("DeliveryTeam","MerchantUsers",new { area="Merchant"})">My delivery team</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-user"></i><span>Sales Team</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("AddSalesman","MerchantUsers",new { area="Merchant"})">Add new</a></li>
+                    <li class=""><a href="@Url.Action("SalesTeam","MerchantUsers",new { area="Merchant"})">My sales team</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="fa fa-building"></i><span>Products</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("AddProducts","MerchantOrders",new { area="Merchant"})">Add new</a></li>
+                    <li class=""><a href="@Url.Action("Products","MerchantOrders",new { area="Merchant"})">My products</a></li>
+                    <li class=""><a href="@Url.Action("MeasurementUnit","MerchantOrders",new { area="Merchant"})">Measurement units</a></li>
+                </ul>
+            </li>
+            <li class=""><a href="@Url.Action("OpenMarket","MerchantUsers",new { area="Merchant"})"><i class="fa fa-group"></i><span>My invitation</span></a></li>
+            <li class=""><a href="#"><i class="icon-question"></i><span>Order complains</span></a></li>
+            <li class="g_heading">Reports</li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-bar-chart"></i><span>Store Report</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("LowStock","Report",new { area="Merchant"})">Low stock report</a></li>
+                    <li class=""><a href="@Url.Action("InStock","Report",new { area="Merchant"})">In stock report</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-pie-chart"></i><span>Report</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("Generator","Report",new { area="Merchant",flag=3})">Order Sales Report</a></li>
+                    <li class=""><a href="@Url.Action("Generator","Report",new { area="Merchant",flag=4})">Purchase Report</a></li>
+                    <li class=""><a href="@Url.Action("Generator","Report",new { area="Merchant",flag=5})">Net Sales Report</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-bar-chart"></i><span>Product Report</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("Generator","Report",new { area="Merchant",flag=6})">Qty movement report</a></li>
+                    <li class=""><a href="@Url.Action("Generator","Report",new { area="Merchant",flag=7})">Product sale report</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
+

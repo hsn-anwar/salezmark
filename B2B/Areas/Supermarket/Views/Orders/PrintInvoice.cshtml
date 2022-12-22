@@ -1,0 +1,163 @@
+﻿
+@{
+    Layout = "~/Areas/Supermarket/Views/Shared/_SupermarketLayout.cshtml";
+    B2B.Areas.Api.Dtos.UserProfileDtos byUser = ViewBag.byUser;
+    B2B.Areas.Api.Dtos.UserProfileDtos forUser = ViewBag.forUser;
+}
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="row clearfix">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">@ViewBag.date</h3>
+                        <div class="card-options">
+                            <a href="@Url.Action("Add","Orders",new { area="Supermarket"})" class="btn btn-info"><i class="si si-printer"></i> Goto marketplace</a>&nbsp;
+                            <button type="button" class="btn btn-primary" onclick='printDiv();'><i class="si si-printer"></i> Print Invoice</button>
+                        </div>
+                    </div>
+                    <div class="card-body" id='DivIdToPrint'>
+                        <div class="row my-8">
+                            <div class="col-6">
+                                <p class="h3">@forUser.Username</p>
+                                <address>
+                                    @ViewBag.orderNumber<br>
+                                    @forUser.Address<br>
+                                    @if (forUser.DeviceNumber != null)
+                                    {
+                                        <span>@forUser.DeviceNumber</span><br />
+                                    }
+                                    @forUser.Email<br>
+                                    @forUser.PhoneNumber
+                                </address>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p class="h3">@byUser.Username</p>
+                                <address>
+                                    @byUser.Address<br>
+                                    @byUser.PhoneNumber<br />
+                                    @if (byUser.Email != null)
+                                    {
+                                        <span>@byUser.Email</span><br />
+                                    }
+                                    @ViewBag.doption<br />
+                                    @if (ViewBag.deliveryTime != null)
+                                    {
+                                        <span>@ViewBag.deliveryTime</span><br />
+                                    }
+                                </address>
+                            </div>
+                        </div>
+                        <div class="table-responsive push">
+                            <table class="table table-bordered table-hover text-nowrap">
+                                <tbody>
+
+                                    <tr>
+                                        <th class="text-center width35"></th>
+                                        <th>Product</th>
+                                        <th class="text-center" style="width: 1%">Qty</th>
+                                        <th class="text-right" style="width: 1%">Tax(%)</th>
+                                        <th class="text-right" style="width: 1%">Discount(%)</th>
+                                        <th class="text-right" style="width: 1%">Price</th>
+                                        <th class="text-right" style="width: 1%">Amount</th>
+                                    </tr>
+
+                                    @if (ViewBag.lines != null)
+                                    {
+                                        int i = 1;
+                                        decimal total = 0.00m;
+                                        decimal totalDiscount = 0.00m;
+                                        decimal totalTax = 0.00m;
+                                        decimal subtotal = 0.00m;
+                                        foreach (B2B.Areas.Supermarket.ViewModel.InvoiceLine line in ViewBag.lines)
+                                        {
+                                            <tr>
+                                                <td class="text-center">@i</td>
+                                                <td>
+                                                    <p class="font600 mb-1">@line.ProductName</p>
+                                                    <div class="text-muted">@line.CategoryName</div>
+                                                </td>
+                                                <td class="text-center">@Convert.ToDouble(String.Format("{0:0.00}", line.Qty))</td>
+                                                @if (line.Tax <= 0)
+                                                {
+                                                    <td class="text-center">0</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-center">@Convert.ToDouble(String.Format("{0:0.00}", line.Tax))</td>
+                                                    decimal lineTax = ((line.Tax * line.ActuallPrice) / 100) * line.Qty;
+                                                    totalTax = totalTax + lineTax;
+                                                }
+                                                @if (line.Discount <= 0)
+                                                {
+                                                    <td class="text-center">0</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-center">@Convert.ToDouble(String.Format("{0:0.00}", line.Discount))</td>
+                                                    decimal lineTax = ((line.Discount * line.ActuallPrice) / 100) * line.Qty;
+                                                    totalDiscount = totalDiscount + lineTax;
+                                                }
+                                                    <td class="text-right">$@Convert.ToDouble(String.Format("{0:0.00}", line.ActuallPrice))</td>
+                                                <td class="text-right">$@Convert.ToDouble(String.Format("{0:0.00}", line.LineTotal))</td>
+                                            </tr>
+                                            i++;
+                                            total = total + line.LineTotal;
+                                            subtotal = subtotal + (line.Qty * line.ActuallPrice);
+                                        }
+
+                                        <tr>
+                                            <td colspan="6" class="font600 text-right">Subtotal</td>
+                                            <td class="text-right">$@Convert.ToDouble(String.Format("{0:0.00}", subtotal))</td>
+                                        </tr>
+                                        <tr class="bg-light">
+                                            <td colspan="6" class="font600 text-right">Tax Rate</td>
+                                            <td class="text-right">$@Convert.ToDouble(String.Format("{0:0.00}", totalTax))</td>
+                                        </tr>
+                                        <tr class="bg-light">
+                                            <td colspan="6" class="font600 text-right">Discount</td>
+                                            <td class="text-right">$@Convert.ToDouble(String.Format("{0:0.00}", totalDiscount))</td>
+                                        </tr>
+                                        <tr class="bg-green text-light">
+                                            <td colspan="6" class="font700 text-right">Grand Total</td>
+                                            <td class="font700 text-right">$@Convert.ToDouble(String.Format("{0:0.00}", total))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <p><span style="font-weight:600">Delivery Note:</span>&nbsp; @ViewBag.note</p>
+                        <p class="text-muted text-center">Thank you very much for doing business with us. We look forward to working with you again!</p>
+                        <div id="qrcode" style="width:200px; height:200px;margin-left: auto;margin-right: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="~/Content/js/qrcode.min.js"></script>
+<script type="text/javascript" src="~/Content/js/qrcode.js"></script>
+
+<script type="text/javascript">
+    function printDiv() {
+
+        var divToPrint = document.getElementById('DivIdToPrint');
+
+        var newWin = window.open('', 'Print-Window');
+
+        newWin.document.open();
+
+        newWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+
+        newWin.document.close();
+
+        setTimeout(function () { newWin.close(); }, 10);
+
+    }
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        width: 200,
+        height: 200
+    });
+
+    qrcode.makeCode("sssssssssssssssssssss");
+</script>

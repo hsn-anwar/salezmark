@@ -1,0 +1,206 @@
+﻿@model List<B2B.Areas.Admin.ViewModel.AdminUser>
+
+@{
+    Layout = "~/Areas/Merchant/Views/Shared/_LayoutMerchant.cshtml";
+}
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="row" style="margin-top:20px">
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">@ViewBag.Total</div>
+                        <a href="@Url.Action("DeliveryTeam","MerchantUsers",new { area="Merchant"})" class="my_sort_cut text-muted">
+                            <i class="fa fa-users"></i>
+                            <span>Total</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box green">@ViewBag.Active</div>
+                        <a href="@Url.Action("DeliveryTeam","MerchantUsers",new { area="Merchant",flag=1})" class="my_sort_cut text-muted">
+                            <i class="icon-user-following"></i>
+                            <span>Active</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box cyan">@ViewBag.Block</div>
+                        <a href="@Url.Action("DeliveryTeam","MerchantUsers",new { area="Merchant",flag=2})" class="my_sort_cut text-muted">
+                            <i class="fa fa-exclamation"></i>
+                            <span>Suspended</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">@ViewBag.Deleted</div>
+                        <a href="@Url.Action("DeliveryTeam","MerchantUsers",new { area="Merchant",flag=3})" class="my_sort_cut text-muted">
+                            <i class="fa fa-trash"></i>
+                            <span>Deleted</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-body w_sparkline" style="min-height: 118px;">
+                        <div class="details">
+                            <span>Order Delivered &nbsp; <small>by delivery team</small> </span>
+                            <h4 class="mb-0 counter">@Convert.ToDouble(String.Format("{0:0}", ViewBag.OrderDelivered))</h4>
+                        </div>
+                        <div class="w_chart">
+                            <i class="fa fa-pie-chart" style="font-size:45px"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" style="display:block">
+                <h3 class="card-title" style="float: left"><i class="fa fa-eye" style="color:#E21E32 !important"></i> &nbsp; My team</h3>
+                <a href="@Url.Action("AddDeliveryBoy","MerchantUsers",new { area="Merchant"})" class="btn btn-info btn-lg" style="float:right"><i class="fa fa-user-plus"></i> &nbsp; Add new member</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>User ID</th>
+                                <th>Phone</th>
+                                <th>Join Date</th>
+                                <th>Country</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+                                    <td class="d-flex">
+                                        @if (merchant.ImageUrl == null)
+                                        {
+                                            <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Email.Substring(0, 1)</span>
+                                        }
+                                        else
+                                        {
+                                            if (File.Exists(Server.MapPath("~" + merchant.ImageUrl)))
+                                            {
+                                                <img class="avatar" src="@merchant.ImageUrl" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">
+                                            }
+                                            else
+                                            {
+                                                <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Email.Substring(0, 1)</span>
+                                            }
+                                        }
+                                        <div class="ml-3">
+                                            <h6 class="mb-0">@merchant.Name</h6>
+                                            <span class="text-muted">@merchant.Email</span>
+                                        </div>
+                                    </td>
+                                    <td><span>@merchant.UserId</span></td>
+                                    <td><span>@merchant.PhoneNumber</span></td>
+                                    <td>@merchant.OutputDate</td>
+                                    <td>@merchant.Country</td>
+                                    <td>@merchant.Status</td>
+                                    <td>
+                                        @if (merchant.Status == B2B.Models.UserStatus.Deleted)
+                                        {
+                                            <button type="button" class="btn btn-icon btn-sm" title="Delete this user" onclick="confirmBlockUnblockSeller('@merchant.Id','@merchant.Status')"><i class="icon-user-follow text-cyan"></i></button>
+                                        }
+                                        else if (merchant.Status == B2B.Models.UserStatus.Active)
+                                        {
+                                            <button type="button" class="btn btn-icon btn-sm" title="Block this user" onclick="confirmBlockUnblockSeller('@merchant.Id','@merchant.Status')"><i class="fa fa-trash text-danger"></i></button>
+                                        }
+                                        else
+                                        {
+                                            <span class="tag tag-danger">Suspended by admin</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("<i class='icon-users'></i> Delicery Team");
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+    function confirmBlockUnblockSeller(sellerId,status) {
+        if (status == 'Active') {
+            swal({
+                title: 'Are you sure?',
+                text: 'You want to delete this user.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }, function () {
+                BlockUser(sellerId);
+            })
+        }
+        else if (status == 'Deleted') {
+            swal({
+                title: 'Are you sure?',
+                text: 'You want to activate this user.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }, function () {
+                BlockUser(sellerId);
+            })
+        }
+
+    }
+    function BlockUser(sellerId) {
+          $.ajax({
+            type: "GET",
+              url: "@Url.Action("ChangeUserStatus", "MerchantUsers",new { area="Merchant"})?userId=" + sellerId,
+              success: function (result) {
+                  if (result.Status) {
+                      location.reload();
+                    }
+                    else {
+                        Swal.fire(
+                            'Not Deleted!',
+                            result.Msg,
+                            'error'
+                        );
+                  }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+</script>
+

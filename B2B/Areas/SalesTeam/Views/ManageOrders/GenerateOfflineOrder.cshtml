@@ -1,0 +1,372 @@
+﻿@model B2B.Areas.Merchant.ViewModel.OrdersVM
+
+@{
+    Layout = "~/Areas/SalesTeam/Views/Shared/_LayoutSaleAdmin.cshtml";
+}
+
+<div class="section-body mt-3">
+    <div class="container-fluid">
+        <div class="card">
+            @using (Html.BeginForm("GenerateOfflineOrder", "ManageOrders", new { area = "SalesTeam" }, FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "Mainform" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body">
+                    <div class="row clearfix">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "Emai (optional)" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @placeholder = "Phone number (* required)" })
+                                @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-6 col-sm-12">
+                            <div class="form-group">
+                                @Html.EnumDropDownListFor(m => m.DeliveryOption, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.DeliveryOption, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-6 col-sm-12">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.UserNumber, new { @class = "form-control", @placeholder = "Enter Customer Id (optional)" })
+                                @Html.ValidationMessageFor(m => m.UserNumber, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-8 col-lg-8 col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Order Assigne To:
+                                </label>
+                                <select class="form-control" id="accept-user-id" name="DeliveryById">
+                                    <option>Please wait...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <div class="form-group">
+                                <label class="custom-control custom-checkbox" style=" margin-top: 2rem;">
+                                    @Html.CheckBox("orderDelivered", new { @class = "custom-control-input" })
+                                    <span class="custom-control-label">Order Delivered</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                @Html.TextAreaFor(m => m.DeliveryNote, new { @type = "text", @class = "form-control", @placeholder = "Sale Note", @rows = "6" })
+                                @Html.ValidationMessageFor(m => m.DeliveryNote, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <select class="form-control" id="itemId">
+                                    <option>Please wait...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="LineTable" style="display:none">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Unit</th>
+                                            <th>Qty</th>
+                                            <th>Sale Price</th>
+                                            <th>Total</th>
+                                            <th>Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="LineTableBody"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="text-right" colspan="4" style="border: none;"><h6>Sub Total</h6></td>
+                                            <td class="text-right" colspan="2">
+                                                <h6 id="SubTotalAmount"></h6>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right" colspan="4" style="border: none;"><h6 style="margin-top: 8px;">Delivery Charges</h6></td>
+                                            <td class="text-right" colspan="2">
+                                                <input class="form-control" name="ShippingCharges" id="ShippingCharges" type="text" onkeypress="return valid_math_number()" onkeyup="remove_dots(this)" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right" colspan="4" style="border: none;"><h6 style="margin-top: 8px;">Grand Total</h6></td>
+                                            <td class="text-right" colspan="2">
+                                                <h6><span id="GrandTotal">0</span></h6>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 mt-3">
+                            <button class="btn btn-primary" type="submit">Confirm Order</button>
+                            <a href="@Url.Action("Orders","ManageOrders",new { area="SalesTeam"})" class="btn btn-outline-primary"><i class="fa fa-arrow-circle-left"></i> &nbsp; Back</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    var item_that_are_already_in_line = [];
+    function Load_User_DD(response) {
+        $('#accept-user-id').html('');
+        $('#accept-user-id').append('<option value="" selected disabled>Select Delivery Boy</option>');
+        //Extract Data List
+        $(response).each(function () {
+            $('#accept-user-id').append('<option value="' + this.Description + '">' + this.Name + '</option>');
+        });
+    }
+    $(document).ready(function () {
+        $("#Page_Title").html('<i class="fa fa-plus"></i> Cash Sale');
+        var Products = getResponseFromUrl('GET', '@Url.Action("GetProductsApi", "ManageOrders",new { area="SalesTeam"})');
+        Load_Items_DD(Products);
+        var Users = getResponseFromUrl('GET', '@Url.Action("GetUserApi", "ManageOrders",new { area="SalesTeam"})');
+        Load_User_DD(Users);
+        $("#itemId").change(function () {
+            var selectedItem = $(this).children("option:selected").val();
+            var checker = item_that_are_already_in_line.indexOf(parseInt(selectedItem));
+            if (checker < 0) {
+                var Item = getResponseFromUrl('GET', '/SalesTeam/ManageOrders/GetProductDetail?ProductId=' + selectedItem);
+                if (Item.Status) {
+                    if (Item.Data.Qty <= 0) {
+                        swal(
+                            'Out of stock',
+                            'Product is out of stock please re-stock first',
+                            'error'
+                        );
+                    } else {
+                        AddLine(Item.Data);
+                    }
+                }
+                else {
+                    swal(
+                        'Server Issue',
+                        Item.Data,
+                        'error'
+                    );
+                }
+            }
+            else {
+                swal(
+                    'Duplicate Entry',
+                    'Item already in Line',
+                    'error'
+                );
+            }
+        });
+        $('form').submit(function () {
+
+            var row = 0;
+            var Noofrows = $('#LineTable tbody tr').length;
+
+            if (Noofrows <= 0) {
+                swal(
+                    "Sales with no Line!",
+                    "Lines should not be empty.",
+                    "error")
+                return false;
+            }
+            $('#LineTable').find('> tbody > tr').each(function () {
+                var column = 1;
+                $(this).find("td input").each(function () {
+                    if (column == 1) {
+                        $(this).attr('name', 'Lines[' + row + '].ProductId');
+                    }
+                    else if (column == 4) {
+                        $(this).attr('name', 'Lines[' + row + '].Qty');
+                    }
+                    else if (column == 5) {
+                        $(this).attr('name', 'Lines[' + row + '].Price');
+                    }
+                    else if (column == 6) {
+                        $(this).attr('name', 'Lines[' + row + '].LineTotal');
+                    }
+                    column++;
+                });
+                row++;
+            });
+
+            return true
+        })
+    })
+    var UpdateSubTotal = function () {
+        var SubTotal = 0;
+        $('.Amount').each(function () {
+            var amount = parseInt($(this).val());
+            SubTotal = SubTotal + amount;
+        })
+        $('#SubTotalAmount').html(SubTotal);
+        $('#GrandTotal').html(SubTotal);
+        $('#ShippingCharges').val(0);
+    }
+    function AddLine(response) {
+        var Qty = response.Qty;
+        var Price = response.Price;
+        var ProductId = response.ProductId;;
+        var ProductName = response.ProductName;
+        var UnitName = response.Unit;
+        var Total = Qty * Price;
+        $('#LineTable > tbody').append('<tr>' +
+            '<td><input type="hidden" value="' + ProductId + '">' +
+            '<input class="form-control text-box single-line" type="text" value="' + ProductName + '" readonly></td>' +
+            '<td><input class="form-control text-box single-line" id="No" type="text" value="' + UnitName + '" readonly></td>' +
+            '<td><input class="form-control text-box single-line QtyLine" id="No" type="text" value="' + Qty+'" min="1" onkeypress="return valid_math_number()" onkeyup="remove_dots(this)"></td>' +
+            '<td><input class="form-control text-box single-line Price" id="No" type="text" value="' + Price + '" min="1" onkeypress="return valid_math_number()" onkeyup="remove_dots(this)"></td>' +
+            '<td><input class="form-control text-box single-line Amount" id="No" type="number" value="' + Total + '" readonly></td>' +
+            '<td><button type="button" class="btn btn-icon btn-sm" title="Delete this line" id="DeleteLineBtn"><i class="fa fa-trash text-danger"></i></button>'+
+            '</td></tr>');
+        item_that_are_already_in_line.push(ProductId);
+        $('#LineTable').show(500);
+        UpdateSubTotal();
+    }
+    $(document).on('click', '#DeleteLineBtn', function () {
+        var id = $(this).parents('tr').find('input[type="hidden"]').val();
+        var index = item_that_are_already_in_line.indexOf(parseInt(id));
+        if (index > -1) {
+            item_that_are_already_in_line.splice(index, 1);
+        }
+        $(this).parents('tr').first().remove();
+        var rowCount = $('#LineTable >tbody >tr').length;
+        if (parseInt(rowCount) <= 0) {
+            $("#LineTable").hide(500);
+        }
+        UpdateSubTotal();
+    });
+    $(document).on('input', '.QtyLine', function () {
+        var Qty = $(this).val();
+        var Total = $(this).parents('tr').find('input[class="form-control text-box single-line Amount"]');
+        var Price = $(this).parents('tr').find('input[class="form-control text-box single-line Price"]').val();
+        $(this).parents('tr').find('input[class="form-control text-box single-line AmountCalculator"]').val(0);
+        CalculateTotalAmount(Qty, Price, Total);
+        UpdateSubTotal();
+    });
+    $(document).on('input', '.Price', function () {
+        var Price = $(this).val();
+        var Total = $(this).parents('tr').find('input[class="form-control text-box single-line Amount"]');
+        var Qty = $(this).parents('tr').find('input[class="form-control text-box single-line QtyLine"]').val();
+        CalculateTotalAmount(Qty, Price, Total);
+        UpdateSubTotal();
+    });
+    $(document).on('input', '#ShippingCharges', function () {
+        var Charges = $(this).val();
+        var SubTotal = 0;
+        $('.Amount').each(function () {
+            var amount = parseFloat($(this).val());
+            SubTotal = parseFloat(SubTotal) + amount;
+        })
+        if (Charges == "" || Charges == undefined || parseInt(Charges) <= 0) {
+            $('#GrandTotal').html(SubTotal);
+        } else {
+            GrandTotal = parseFloat(Charges) + parseFloat(SubTotal);
+            $('#GrandTotal').html(GrandTotal);
+        }
+    });
+    var CalculateTotalAmount = function (Qty, UnitPrice, Total) {
+        Total.val('0');
+        if (parseInt(Qty) > 0 && Qty != '' && UnitPrice != '' && parseInt(UnitPrice) > 0) {
+            var TotalAmount = parseInt(Qty) * parseInt(UnitPrice);
+            //Set Amount
+            Total.val(TotalAmount);
+        }
+        else {
+            swal(
+                'Invalid Field',
+                'Qty or unit price should not be empty.',
+                'error'
+            );
+        }
+    }
+    function valid_math_number() {
+        return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46;
+    }
+    function remove_zeros(elem) {
+        var val = $(elem).val();
+        var tmp = val.replace(/^0+/, '0');
+        if (tmp.charAt(0) == 0 && tmp.charAt(1) > 0) {
+            tmp = 0;
+        }
+        $(elem).val(tmp);
+    }
+    function remove_dots(elem) {
+        var val = $(elem).val();
+        var tmp = val.replace(/^0+/, '0');
+        fixer = 0;
+        if (val.includes(".")) {
+            if (tmp.charAt(0) == ".") {
+                $(elem).val(fixer);
+
+            }
+            // IF DOUBLE MINUS APPEARS
+            else if ((val.match(/\./g).length) > 1) {
+                $(elem).val(fixer);
+
+            }
+        }
+    }
+    function math_fix(val, id) {
+        var contains_dot = false;
+        var contains_minus = false;
+        var contains_plus = false;
+        var fixer = 0;
+        var length = 0;
+        //------| CHECKING MINUS FOR DUPLICATIONS |------\\
+        if (val.includes("-")) {
+            // IF DOUBLE MINUS APPEARS
+            if (val.charAt(0) != "-" && val.includes("-")) {
+                $("#" + id).val(fixer);
+            }
+            else if ((val.match(/-/g).length) > 1) {
+                $("#" + id).val(fixer);
+            }
+            contains_minus = true;
+        }
+        //------| CHECKING POINT(DOT) FOR DUPLICATIONS |------\\
+        if (val.includes("+")) {
+            // IF DOUBLE MINUS APPEARS
+            if (val.charAt(0) != "+" && val.includes("+")) {
+                $("#" + id).val(fixer);
+            }
+            else if ((val.match(/\+/g).length) > 1) {
+                $("#" + id).val(fixer);
+            }
+            contains_dot = true;
+        }
+    }
+    function valid_number() {
+        return event.charCode >= 48 && event.charCode <= 57;
+    }
+    function Load_Items_DD(response) {
+        $('#itemId').html('');
+        $('#itemId').append('<option value="" selected disabled>select a product</option>');
+        //Extract Data List
+        $(response).each(function () {
+            $('#itemId').append('<option value="' + this.Id + '">' + this.Name + '</option>');
+        });
+    }
+    var getResponseFromUrl = function (requestType, requestUrl, requestData = null) {
+
+        var response;
+        $.ajax({
+            type: requestType,
+            url: requestUrl,
+            data: requestData,
+            async: false,
+            success: function (data) {
+                response = data;
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+        return response;
+    }
+</script>

@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "Inquiries";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="row" style="margin-top:20px">
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">0</div>
+                        <a href="#" class="my_sort_cut text-muted">
+                            <i class="fa fa-list-alt"></i>
+                            <span>Total</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box green">0</div>
+                        <a href="#" class="my_sort_cut text-muted">
+                            <i class="fa fa-list"></i>
+                            <span>Pending</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box cyan">0</div>
+                        <a href="#" class="my_sort_cut text-muted">
+                            <i class="fa fa-folder-open"></i>
+                            <span>Opened</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box cyan">0</div>
+                        <a href="#" class="my_sort_cut text-muted">
+                            <i class="fa fa-close"></i>
+                            <span>Closed</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">0</div>
+                        <a href="#" class="my_sort_cut text-muted">
+                            <i class="fa fa-plus"></i>
+                            <span>New</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box green">0</div>
+                        <a href="#" class="my_sort_cut text-muted">
+                            <i class="fa fa-clock-o"></i>
+                            <span>Solved</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">User Inquiries</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>User ID</th>
+                                <th>Created On</th>
+                                <th>Reply Email</th>
+                                <th>Reply Phone</th>
+                                <th>Comments</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("User Inquiries");
+    })
+</script>

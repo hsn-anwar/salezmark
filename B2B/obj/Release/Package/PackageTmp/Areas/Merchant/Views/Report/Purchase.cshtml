@@ -1,0 +1,129 @@
+﻿@model List<B2B.Areas.Merchant.ViewModel.OrdersVM>
+@{
+    Layout = "~/Areas/Merchant/Views/Shared/_LayoutMerchant.cshtml";
+}
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header" style="display: block;">
+                <h3 class="card-title" style="float:left"><i class="fa fa-eye" style="color:#E21E32 !important"></i> &nbsp; Purchase history</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Number#</th>
+                                <th>Purchase Note</th>
+                                <th>Total Bill</th>
+                                <th>View Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+                                    <td>@merchant.Date</td>
+                                    <td><span>@merchant.OrderNumber</span></td>
+                                    <td>@merchant.DeliveryNote</td>
+                                    <td><span>@merchant.TotalBill</span></td>
+                                    <td>
+                                        <button type="button" class="btn btn-icon btn-sm" title="View this invoice lines" onclick="ViewLines('@merchant.Id')" data-toggle="modal" data-target="#line-model"><i class="fa fa-eye text-blue"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("Generator","Report",new { area="Merchant",flag=4})" class="btn btn-outline-primary"><i class="fa fa-backward"></i> &nbsp; Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="line-model" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Sale lines</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="Line-Table">
+                                <thead>
+                                    <tr>
+                                        <th>Sr#</th>
+                                        <th>Product Name</th>
+                                        <th>Cost</th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="Line-Table-Body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html('<i class="fa fa-list" ></i> Purchase history report</small>');
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        });
+    var getResponseFromUrl = function (requestType, requestUrl, requestData = null) {
+
+        var response;
+        $.ajax({
+            type: requestType,
+            url: requestUrl,
+            data: requestData,
+            async: false,
+            success: function (data) {
+                response = data;
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+        return response;
+    }
+    function ViewLines(Id) {
+        $('#Line-Table-Body').html("");
+        var response = getResponseFromUrl('GET', '@Url.Action("GetPurchaseOrderLineDetail", "MerchantOrders",new { area="Merchant"})?Id=' + Id);
+        var counter = 1;
+        $(response).each(function () {
+            $('#Line-Table-Body').append('<tr>' +
+                '<td>' + counter + '</td>' +
+                '<td>' + this.ProductName+'</td>' +
+                '<td>' + this.Price +'</td>' +
+                '<td>' + this.Qty +'</td>' +
+                '<td>' + this.LineTotal +'</td>' +
+                '</tr>');
+
+            counter++;
+        });
+    }
+</script>
+

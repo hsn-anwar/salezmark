@@ -1,0 +1,139 @@
+﻿
+@{
+    ViewBag.Title = "Orders";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="row" style="margin-top:20px">
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">@ViewBag.Total</div>
+                        <a href="@Url.Action("Orders","Marketplace",new { area="Admin"})" class="my_sort_cut text-muted">
+                            <i class="fa fa-first-order"></i>
+                            <span>Total</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box cyan">@ViewBag.Pending</div>
+                        <a href="@Url.Action("Orders","Marketplace",new { area="Admin",flag=1})" class="my_sort_cut text-muted">
+                            <i class="fa fa-list"></i>
+                            <span>Pending</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box green">@ViewBag.Inprocess</div>
+                        <a href="@Url.Action("Orders","Marketplace",new { area="Admin",flag=2})" class="my_sort_cut text-muted">
+                            <i class="icon-user-following"></i>
+                            <span>In Process</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box cyan">@ViewBag.Cancelled</div>
+                        <a href="@Url.Action("Orders","Marketplace",new { area="Admin",flag=3})" class="my_sort_cut text-muted">
+                            <i class="fa fa-user-times"></i>
+                            <span>Cancelled</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">@ViewBag.Delivered</div>
+                        <a href="@Url.Action("Orders","Marketplace",new { area="Admin",flag=4})" class="my_sort_cut text-muted">
+                            <i class="fa fa-clock-o"></i>
+                            <span>Delivered</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box green">@ViewBag.New</div>
+                        <a href="@Url.Action("Orders","Marketplace",new { area="Admin",flag=5})" class="my_sort_cut text-muted">
+                            <i class="fa fa-plus"></i>
+                            <span>New</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Orders List</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Number#</th>
+                                <th>Type</th>
+                                <th>Billing Email</th>
+                                <th>Billing Phone</th>
+                                <th>Shopkeeper</th>
+                                <th>Delivery Note</th>
+                                <th>Total Bill</th>
+                                <th>Delivery Charges</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                                <tr>
+                                    <td>@merchant.Date</td>
+                                    <td><span>@merchant.OrderNumber</span></td>
+                                    <td><span>@merchant.Type</span></td>
+                                    <td><span>@merchant.Email</span></td>
+                                    <td><span>@merchant.PhoneNumber</span></td>
+                                    <td><span>@merchant.CustomerName</span></td>
+                                    <td><span>@merchant.DeliveryNote</span></td>
+                                    <td><span>@merchant.TotalBill</span></td>
+                                    <td><span>@merchant.ShippingCharges</span></td>
+                                    <td>
+                                        @if (merchant.Status == B2B.Models.orderStatusEnum.Canceled)
+                                        {
+                                            <span class="tag tag-danger">@merchant.CanceledComment</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("Orders Dashboard");
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+</script>

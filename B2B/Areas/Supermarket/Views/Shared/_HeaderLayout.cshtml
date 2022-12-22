@@ -1,0 +1,53 @@
+﻿<div id="header_top" class="header_top">
+    <div class="container">
+        <div class="hleft">
+            <a class="header-brand" href="@Url.Action("Add","Orders",new { area="Supermarket"})"><i class="fe fe-command brand-logo"></i></a>
+            <div class="dropdown">
+                <a href="@Url.Action("ViewCarts","Orders",new { area="Supermarket"})" class="nav-link icon xs-hide"><i class="fa fa-shopping-basket"></i></a>
+                <a href="@Url.Action("Add","Orders",new { area="Supermarket"})" class="nav-link icon app_file xs-hide"><i class="fa fa-opencart"></i></a>
+            </div>
+        </div>
+        <div class="hright">
+            <div class="dropdown">
+                <a href="javascript:void(0)" class="nav-link icon menu_toggle"><i class="fa  fa-align-left"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="left-sidebar" class="sidebar ">
+    <h5 class="brand-name">Business <a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
+    <nav id="left-sidebar-nav" class="sidebar-nav">
+        <ul class="metismenu">
+            <li class=""><a href="@Url.Action("Add","Orders",new { area="Supermarket"})"><i class="fa fa-opencart"></i><span>Marketplace</span></a></li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-list"></i><span>Orders</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("AuthOrders","Orders",new { area="Supermarket"})">Need Authentication</a></li>
+                    <li class=""><a href="@Url.Action("ManageOrders","Orders",new { area="Supermarket"})">My orders</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="fa fa-users"></i><span>Supervisor</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("Add","Supervisor",new { area="supermarket"})">Add new</a></li>
+                    <li class=""><a href="@Url.Action("Index","Supervisor",new { area="supermarket"})">My supervisors</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="fa fa-building"></i><span>Branch</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("Add","Branch",new { area="supermarket"})">Add new</a></li>
+                    <li class=""><a href="@Url.Action("Index","Branch",new { area="supermarket"})">My branches</a></li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="javascript:void(0)" class="has-arrow arrow-c"><i class="icon-bar-chart"></i><span>Report</span></a>
+                <ul>
+                    <li class=""><a href="@Url.Action("SupervisorOrdersReport","Orders",new { area="supermarket"})">Supervisor report</a></li>
+                    <li class=""><a href="@Url.Action("OrdersReport","Orders",new { area="supermarket"})">Order report</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
+

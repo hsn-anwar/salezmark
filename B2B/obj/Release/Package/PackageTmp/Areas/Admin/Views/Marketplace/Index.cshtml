@@ -1,0 +1,209 @@
+﻿@model List<B2B.Areas.Merchant.ViewModel.ProductsVM>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<div class="section-body">
+    <div class="container-fluid">
+        <div class="row" style="margin-top:20px">
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">@ViewBag.Total</div>
+                        <a href="@Url.Action("Index","Marketplace",new { area="Admin"})" class="my_sort_cut text-muted">
+                            <i class="fa fa-list-alt"></i>
+                            <span>Total</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box cyan">@ViewBag.Active</div>
+                        <a href="@Url.Action("Index","Marketplace",new { area="Admin",flag=1})" class="my_sort_cut text-muted">
+                            <i class="fa fa-circle-o-notch"></i>
+                            <span>Active</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box green">@ViewBag.Deleted</div>
+                        <a href="@Url.Action("Index","Marketplace",new { area="Admin",flag=2})" class="my_sort_cut text-muted">
+                            <i class="fa fa-trash"></i>
+                            <span>Deleted</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box cyan">@ViewBag.Block</div>
+                        <a href="@Url.Action("Index","Marketplace",new { area="Admin",flag=3})" class="my_sort_cut text-muted">
+                            <i class="fa fa-exclamation"></i>
+                            <span>Blocked</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box orange">@ViewBag.New</div>
+                        <a href="@Url.Action("Index","Marketplace",new { area="Admin",flag=4})" class="my_sort_cut text-muted">
+                            <i class="fa fa-plus"></i>
+                            <span>New</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="card">
+                    <div class="card-body ribbon">
+                        <div class="ribbon-box green">@ViewBag.Complain</div>
+                        <a class="my_sort_cut text-muted">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            <span>Complains</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Product List</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-vcenter text-nowrap mb-0" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Actual Price</th>
+                                <th>Sale Price</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var merchant in Model)
+                            {
+                            <tr>
+                                <td class="d-flex">
+                                    @if (merchant.FeatureImageUrl == null)
+                                    {
+                                        <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Name.Substring(0, 1)</span>
+                                    }
+                                    else
+                                    {
+                                        if (File.Exists(Server.MapPath("~" + merchant.FeatureImageUrl)))
+                                        {
+                                            <img class="avatar" src="@merchant.FeatureImageUrl" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">
+                                        }
+                                        else
+                                        {
+                                            <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Name" data-original-title="@merchant.Name">@merchant.Name.Substring(0, 1)</span>
+                                        }
+                                    }
+                                    <div class="ml-3">
+                                        <h6 class="mb-0">@merchant.Name</h6>
+                                        <h6 class="mb-0">@merchant.Date</h6>
+                                    </div>
+                                </td>
+                                <td><span>@merchant.ActualPrice</span></td>
+                                <td>@merchant.SalePrice</td>
+                                <td class="d-flex">
+                                    @if (merchant.Specification == null)
+                                    {
+                                        <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Description" data-original-title="@merchant.Description">@merchant.Description.Substring(0, 1)</span>
+                                    }
+                                    else
+                                    {
+                                        if (File.Exists(Server.MapPath("~" + merchant.Specification)))
+                                        {
+                                            <img class="avatar" src="@merchant.Specification" data-toggle="tooltip" title="@merchant.Description" data-original-title="@merchant.Description">
+                                        }
+                                        else
+                                        {
+                                            <span class="avatar avatar-blue" data-toggle="tooltip" title="@merchant.Description" data-original-title="@merchant.Description">@merchant.Description.Substring(0, 1)</span>
+                                        }
+                                    }
+                                    <div class="ml-3">
+                                        <h6 class="mb-0">@merchant.Description</h6>
+                                    </div>
+                                </td>
+                                <td>@merchant.userStatus</td>
+                                <td>
+                                    @if (merchant.userStatus == B2B.Models.UserStatus.Active)
+                                    {
+                                        <button type="button" class="btn btn-icon btn-sm" title="Suspend this product" onclick="confirmBlockUnblockSeller('@merchant.Id','You want to block this product from marketplace')"><i class="fa fa-trash text-danger"></i></button>
+                                    }
+                                    else if (merchant.userStatus == B2B.Models.UserStatus.Blocked)
+                                    {
+                                        <button type="button" class="btn btn-icon btn-sm" title="Restore this product" onclick="confirmBlockUnblockSeller('@merchant.Id','You want to unblock this product from suspension')"><i class="icon-user-following"></i></button>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#Page_Title").html("Marketplace Dashboard");
+    })
+    $('#user-table').DataTable(
+        {
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+            "iDisplayLength": 5
+        }
+    );
+    function confirmBlockUnblockSeller(Id,msg) {
+        swal({
+            title: 'Are you sure?',
+            text: msg,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }, function () {
+            BlockUser(Id);
+        })
+    }
+    function BlockUser(Id) {
+          $.ajax({
+            type: "GET",
+              url: "@Url.Action("ChangeProductState", "Marketplace",new { area="Admin"})?Id=" + Id,
+              success: function (result) {
+                  if (result.Status) {
+                      location.reload();
+                    }
+                    else {
+                        swal(
+                            'Not Blocked!',
+                            result.Msg,
+                            'error'
+                        );
+                  }
+            },
+            error: function (error) {
+                return error;
+            },
+        });
+    }
+</script>

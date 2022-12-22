@@ -1,0 +1,25 @@
+﻿@{
+    Layout = null;
+}
+
+<form action="https://secure.smoovpay.com/access" method="post">
+    <input type="hidden" name="action" value="pay" />
+    <input type="hidden" name="currency" value="SGD" />
+    <input type="hidden" name="version" value="2.0" />
+    <input type="hidden" name="item_name_1" value="item 1" />
+    <input type="hidden" name="item_description_1" value="Description for item 1" />
+    <input type="hidden" name="item_quantity_1" value="1" />
+    <input type="hidden" name="item_amount_1" value="0.00" />
+    <input type="hidden" name="merchant" value="mycarbathsg@gmail.com" />
+    <input type="hidden" name="ref_id" value="SampleReference" />
+    <input type="hidden" name="delivery_charge" value="0.00" />
+    <input type="hidden" name="tax_amount" value="0.00" />
+    <input type="hidden" name="tax_percentage" value="0.00" />
+    <input type="hidden" name="total_amount" value="0.50" />
+    <input type="hidden" name="str_url" value="" />
+    <input type="hidden" name="success_url" value="http://www.yourweb.com/SuccessPage" />
+    <input type="hidden" name="cancel_url" value="http://www.yourweb.com/" />
+    <input type="hidden" name="signature" value="cee02c341752bbadb16b514437e11ed80451abe4" />
+    <input type="hidden" name="signature_algorithm" value="sha1" />
+    <input type="image" src="https://www.smoovpay.com/img/btn_smoovpay_v1.png" name="submit" alt="SmoovPay!" />
+</form>
